@@ -1,3 +1,4 @@
+A H
 2 H
 3 H
 4 H
@@ -10,7 +11,7 @@ T H
 J H
 Q H
 K H
-A H
+A C
 2 C
 3 C
 4 C
@@ -23,7 +24,7 @@ T C
 J C
 Q C
 K C
-A C
+A D
 2 D
 3 D
 4 D
@@ -36,7 +37,7 @@ T D
 J D
 Q D
 K D
-A D
+A S
 2 S
 3 S
 4 S
@@ -49,4 +50,3 @@ T S
 J S
 Q S
 K S
-A S

@@ -20,16 +20,16 @@ Card *f1,*f2,*f3,*f4;
 
 
 //decleration of methods used in the program
-Card *LD(char* filepath);
+Card *LD(char *filepath);
 enum Suit getSuit(char suit);
 int getValue(char value);
-void printList(struct Card* c);
-void swapCards(struct Card* card1, struct Card* card2);
+void printList(Card *c);
+void swapCards(Card* card1, Card* card2);
 Card *getCardAtIndex(Card *head, int index);
 void shuffleList(Card *head);
 void makeBoard(char *lc,char *msg);
 void printFrow(int row);
-char* doCommand(char command[]);
+char* doCommand(char *command);
 int main() {
 
 
@@ -43,7 +43,7 @@ int main() {
          //adds a line between each new print gameboard
           printf("\n");
           //does the command
-       //   doCommand(lastCommand);
+          doCommand(&lastCommand);
           //makes a new board
           makeBoard(lastCommand, doCommand(lastCommand));
     }
@@ -64,14 +64,20 @@ int main() {
     */
 
 }
-char* doCommand(char command[])
+char* doCommand(char *command)
 {
 
   if(strcmp(command, "start") == 0){
       return "ok";
-    } else if(strcmp(command, "LD")==0)
+    } else if(command[0] == 'L'&& command[1]=='D')
   {
-
+      if(sizeof(command)<3)
+      {
+          LD(&command[3]);
+      } else
+      {
+          LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
+      }
   }
   else
   {
@@ -81,34 +87,34 @@ char* doCommand(char command[])
 }
 void printFrow(int row)
 {
-#if(0)
+
     char toPrint[3] = "[]";
     switch (row) {
         case 0:
-            if (headarray[7] != NULL) {
-                toPrint[0] = headarray[7]->rank;
-                toPrint[1] = headarray[7]->suit + 'H';
+            if (f1 != NULL) {
+                toPrint[0] = f1->rank;
+                toPrint[1] = f1->suit + 'H';
             }
             printf("%s    F1", toPrint);
             break;
         case 1:
-            if (headarray[8] != NULL) {
-                toPrint[0] = headarray[8]->rank;
-                toPrint[1] = headarray[8]->suit + 'H';
+            if (f2!= NULL) {
+                toPrint[0] =f2->rank;
+                toPrint[1] =f2->suit + 'H';
             }
             printf("%s    F2", toPrint);
             break;
         case 2:
-            if (headarray[9] != NULL) {
-                toPrint[0] = headarray[9]->rank;
-                toPrint[1] = headarray[9]->suit + 'H';
+            if (f3 != NULL) {
+                toPrint[0] = f3->rank;
+                toPrint[1] =f3->suit + 'H';
             }
             printf("%s    F3", toPrint);
             break;
         case 3:
-            if (headarray[10] != NULL) {
-                toPrint[0] = headarray[10]->rank;
-                toPrint[1] = headarray[10]->suit + 'H';
+            if (f4 != NULL) {
+                toPrint[0] = f4->rank;
+                toPrint[1] = f4->suit + 'H';
             }
             printf("%s    F4", toPrint);
             break;
@@ -116,7 +122,7 @@ void printFrow(int row)
             // handle error condition
             break;
     }
-#endif
+
 }
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
@@ -146,6 +152,7 @@ void makeBoard(char *lc,char *msg)
        isemtpy = printCCard(c5,row,isemtpy);
        isemtpy = printCCard(c6,row,isemtpy);
        isemtpy = printCCard(c7,row,isemtpy);
+       printFrow(row);
        printf("\n");
        row++;
      }
@@ -153,7 +160,7 @@ void makeBoard(char *lc,char *msg)
     printf("\nMessage:%s\n",msg);
     printf("INPUT >");
 
-    // printFrow(row,carray);
+
 
 
 
@@ -204,14 +211,14 @@ Card* LD(char* filepath)
 
 
     //reading the whole file to end
-        struct Card* head = NULL;
-        struct Card* cardBefore= NULL;
+       Card* head = NULL;
+      Card* cardBefore= NULL;
         int i = 0;
       while  (fgets(singleLine,150,fPointer) !=NULL){
 
           if(head==NULL)
           {
-              head = malloc(sizeof(struct Card));
+              head = malloc(sizeof(Card));
               head->suit = getSuit(singleLine[2]);
               head->rank = getValue(singleLine[0]);
               cardBefore = head;
@@ -219,7 +226,7 @@ Card* LD(char* filepath)
           else
           {
 
-              struct  Card* newCard =malloc(sizeof(struct Card));
+              Card* newCard =malloc(sizeof( Card));
               cardBefore->nextCard=newCard;
               newCard->suit = getSuit(singleLine[2]);
               newCard->rank = getValue(singleLine[0]);
@@ -288,10 +295,10 @@ int getValue(char value)
     return v;
 
 }
-void shuffleList(struct Card* head)
+void shuffleList(Card* head)
 {
     int count = 0;
-    struct Card* current = head;
+    Card* current = head;
     // Count the number of cards in the list
     while (current != NULL) {
         count++;
@@ -302,8 +309,8 @@ void shuffleList(struct Card* head)
         // Generate a random index between 0 and i (inclusive)
         int j = rand() % (i + 1);
         // Swap the cards at index i and j
-        struct Card* card_i = getCardAtIndex(head, i);
-        struct Card* card_j = getCardAtIndex(head, j);
+        Card* card_i = getCardAtIndex(head, i);
+        Card* card_j = getCardAtIndex(head, j);
         swapCards(card_i, card_j);
     }
 }
@@ -326,7 +333,7 @@ Card *getCardAtIndex(Card *head, int index)
 }
 
 // Helper function to swap two cards
-void swapCards(struct Card* card1, struct Card* card2)
+void swapCards(Card* card1, Card* card2)
 {
     int temp_rank = card1->rank;
     enum Suit temp_suit = card1->suit;
