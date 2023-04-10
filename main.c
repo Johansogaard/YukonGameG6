@@ -2,34 +2,38 @@
 #include <process.h>
 #include <malloc.h>
 #include <string.h>
+#include <stdbool.h>
 
 
 enum Suit{H,C,D,S};
 //the struct that symbolize a card
-struct Card {
+typedef struct Cards {
     int rank;
     enum Suit suit;
-    struct Card* nextCard;
-};
+    struct Cards* nextCard;
+}Card;
+
+//define c1-c7
+Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
+//define f1-f4;
+Card *f1,*f2,*f3,*f4;
+
 
 //decleration of methods used in the program
-struct Card* LD(char* filepath);
+Card *LD(char* filepath);
 enum Suit getSuit(char suit);
 int getValue(char value);
 void printList(struct Card* c);
 void swapCards(struct Card* card1, struct Card* card2);
-struct Card* getCardAtIndex(struct Card* head, int index);
-void shuffleList(struct Card* head);
-void makeBoard(struct Card *headarray[],char lc[],char msg[]);
-void printFrow(int row,struct Card *headarray[]);
+Card *getCardAtIndex(Card *head, int index);
+void shuffleList(Card *head);
+void makeBoard(char *lc,char *msg);
+void printFrow(int row);
 char* doCommand(char command[]);
 int main() {
 
-    struct Card *headarray[11];
-    for (int i = 0; i <11 ; ++i) {
-        headarray[i]= NULL;
-    }
-    makeBoard(headarray,"","");
+
+    makeBoard("","");
     while (1)
     {
         char lastCommand[50];
@@ -41,7 +45,7 @@ int main() {
           //does the command
        //   doCommand(lastCommand);
           //makes a new board
-          makeBoard(headarray,lastCommand, doCommand(lastCommand));
+          makeBoard(lastCommand, doCommand(lastCommand));
     }
 
    struct Card* deck;
@@ -65,39 +69,43 @@ char* doCommand(char command[])
 
   if(strcmp(command, "start") == 0){
       return "ok";
-    } else
+    } else if(strcmp(command, "LD")==0)
+  {
+
+  }
+  else
   {
       return "Command not found";
   }
 
 }
-void printFrow(int row,struct Card *headarray[])
+void printFrow(int row)
 {
-
-    char toPrint[] = "[]";
+#if(0)
+    char toPrint[3] = "[]";
     switch (row) {
-        case 1:
+        case 0:
             if (headarray[7] != NULL) {
                 toPrint[0] = headarray[7]->rank;
                 toPrint[1] = headarray[7]->suit + 'H';
             }
             printf("%s    F1", toPrint);
             break;
-        case 2:
+        case 1:
             if (headarray[8] != NULL) {
                 toPrint[0] = headarray[8]->rank;
                 toPrint[1] = headarray[8]->suit + 'H';
             }
             printf("%s    F2", toPrint);
             break;
-        case 3:
+        case 2:
             if (headarray[9] != NULL) {
                 toPrint[0] = headarray[9]->rank;
                 toPrint[1] = headarray[9]->suit + 'H';
             }
             printf("%s    F3", toPrint);
             break;
-        case 4:
+        case 3:
             if (headarray[10] != NULL) {
                 toPrint[0] = headarray[10]->rank;
                 toPrint[1] = headarray[10]->suit + 'H';
@@ -108,64 +116,50 @@ void printFrow(int row,struct Card *headarray[])
             // handle error condition
             break;
     }
+#endif
 }
-void makeBoard( struct Card *carray[],char lc[],char msg[])
+bool printCCard(Card *c,int row,bool isEmpty) {
+    if(getCardAtIndex(c,row)!=NULL)
+    {
+        printf("%d%d\t", getCardAtIndex(c1,row)->rank,getCardAtIndex(c1,row)->suit);
+        return false;
+    }else{
+
+        printf("\t");
+        return isEmpty;
+    }
+}
+void makeBoard(char *lc,char *msg)
 {
     printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n");
-    int bool[7] = {0,0,0,0,0,0,0};
-
-        for (int i = 0; i < 7; ++i) {
-            if (carray[i] != NULL) {
-                bool[i] = 1;
-            } else {
-                bool[i] = 0;
-            }
-
-    }
-    int row = 1;
 
 
-   while(1){
+    int row = 0;
+    bool isemtpy = false;
 
-     for(int f=0;f<7;f++) {
-        if(bool[f]==1)
-        {
-            printf("%d%d\t", getCardAtIndex(carray[f],row)->rank,getCardAtIndex(carray[f],row)->suit);
-            if(getCardAtIndex(carray[f],row)->nextCard==NULL)
-            {
-                bool[f]=0;
-            }
-
-
-        } else{
-
-            printf("\t");
-        }
-
+   while((isemtpy == false) || (row<4)){
+         isemtpy = true;
+        isemtpy = printCCard(c1,row,isemtpy);
+         isemtpy = printCCard(c2,row,isemtpy);
+       isemtpy = printCCard(c3,row,isemtpy);
+       isemtpy = printCCard(c4,row,isemtpy);
+       isemtpy = printCCard(c5,row,isemtpy);
+       isemtpy = printCCard(c6,row,isemtpy);
+       isemtpy = printCCard(c7,row,isemtpy);
+       printf("\n");
+       row++;
      }
-
-     printFrow(row,carray);
-     printf("\n");
-     row++;
-     int check =0;
-     for(int i =0;i<7;i++  )
-     {
-         if(bool[i]==1)
-         {
-             check = 1;
-         }
-
-     }
-     if(row >4 && check ==0)
-     {
-         break;
-     }
-    }
     printf("LAST Command:%s",lc);
     printf("\nMessage:%s\n",msg);
     printf("INPUT >");
+
+    // printFrow(row,carray);
+
+
+
+
 }
-void printList(struct Card* c)
+void printList(Card* c)
 {
     int i =0;
     while (c != NULL) {
@@ -191,7 +185,7 @@ void printList(struct Card* c)
         c = c->nextCard;
     }
 }
-struct Card* LD(char* filepath)
+Card* LD(char* filepath)
 {
 
 
@@ -315,13 +309,20 @@ void shuffleList(struct Card* head)
 }
 
 // Helper function to get the card at a given index
-struct Card* getCardAtIndex(struct Card* head, int index)
+Card *getCardAtIndex(Card *head, int index)
 {
-    struct Card* current = head;
-    for (int i = 0; i < index; i++) {
-        current = current->nextCard;
+    if(head == NULL)
+    {
+        return head;
     }
-    return current;
+    for (int i = 0; i < index; i++) {
+        head = head->nextCard;
+        if(head == NULL)
+        {
+            break;
+        }
+    }
+    return head;
 }
 
 // Helper function to swap two cards
