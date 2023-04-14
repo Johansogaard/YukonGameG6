@@ -13,6 +13,7 @@ typedef struct Cards {
     int rank;
     enum Suit suit;
     struct Cards* nextCard;
+
 }Card;
 
 //define c1-c7
@@ -47,9 +48,9 @@ int main() {
          //adds a line between each new print gameboard
           printf("\n");
           //does the command
-          doCommand(&lastCommand);
+
           //makes a new board
-          makeBoard(lastCommand, doCommand(lastCommand));
+          makeBoard(lastCommand, doCommand(&lastCommand));
     }
 
    struct Card* deck;
@@ -73,9 +74,9 @@ void addCards(Card *cards)
     int row=0;
     int i =0;
     Card *c[] = {c1,c2,c3,c4,c5,c6,c7};
-    for (int j = 0; j < 7; ++j) {
-        c[i] = cards;
-        i = (i+1)%7;
+    for (int j = 0; j < (sizeof(c)/sizeof(c1)) ; ++j) {
+        c[j] = cards;
+
         cards = cards->nextCard;
     }
     while (cards!=NULL)
@@ -89,6 +90,13 @@ void addCards(Card *cards)
         i = i%7;
         cards = cards->nextCard;
     }
+    c1 = c[0];
+    c2 = c[1];
+    c3 = c[2];
+    c4 = c[3];
+    c5 = c[4];
+    c6 = c[5];
+    c7 = c[6];
 }
 char* doCommand(char *command)
 {
@@ -155,7 +163,7 @@ void printFrow(int row)
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
     {
-        printf("%d%d\t", getCardAtIndex(c1,row)->rank, getCharSuit(getCardAtIndex(c1,row)->suit));
+        printf("%d%c\t", getCardAtIndex(c,row)->rank, getCharSuit(getCardAtIndex(c,row)->suit));
         return false;
     }else{
 
@@ -262,6 +270,7 @@ Card* LD(char* filepath)
           }
 
     };
+      cardBefore->nextCard=NULL;
     return head;
 
 }
