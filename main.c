@@ -3,6 +3,8 @@
 #include <malloc.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
 
 
 enum Suit{H,C,D,S};
@@ -30,6 +32,8 @@ void shuffleList(Card *head);
 void makeBoard(char *lc,char *msg);
 void printFrow(int row);
 char* doCommand(char *command);
+void addCards(Card *cards);
+char getCharSuit(int Suit);
 int main() {
 
 
@@ -64,6 +68,28 @@ int main() {
     */
 
 }
+void addCards(Card *cards)
+{
+    int row=0;
+    int i =0;
+    Card *c[] = {c1,c2,c3,c4,c5,c6,c7};
+    for (int j = 0; j < 7; ++j) {
+        c[i] = cards;
+        i = (i+1)%7;
+        cards = cards->nextCard;
+    }
+    while (cards!=NULL)
+    {
+        getCardAtIndex(c[i],row)->nextCard = cards;
+        i = (i+1);
+        if(i ==7)
+        {
+            row = row+1;
+        }
+        i = i%7;
+        cards = cards->nextCard;
+    }
+}
 char* doCommand(char *command)
 {
 
@@ -74,9 +100,11 @@ char* doCommand(char *command)
       if(sizeof(command)<3)
       {
           LD(&command[3]);
+          //substring
       } else
       {
-          LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
+          addCards(LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt"));
+
       }
   }
   else
@@ -127,7 +155,7 @@ void printFrow(int row)
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
     {
-        printf("%d%d\t", getCardAtIndex(c1,row)->rank,getCardAtIndex(c1,row)->suit);
+        printf("%d%d\t", getCardAtIndex(c1,row)->rank, getCharSuit(getCardAtIndex(c1,row)->suit));
         return false;
     }else{
 
@@ -145,10 +173,10 @@ void makeBoard(char *lc,char *msg)
 
    while((isemtpy == false) || (row<4)){
          isemtpy = true;
-        isemtpy = printCCard(c1,row,isemtpy);
+         isemtpy = printCCard(c1,row,isemtpy);
          isemtpy = printCCard(c2,row,isemtpy);
-       isemtpy = printCCard(c3,row,isemtpy);
-       isemtpy = printCCard(c4,row,isemtpy);
+         isemtpy = printCCard(c3,row,isemtpy);
+        isemtpy = printCCard(c4,row,isemtpy);
        isemtpy = printCCard(c5,row,isemtpy);
        isemtpy = printCCard(c6,row,isemtpy);
        isemtpy = printCCard(c7,row,isemtpy);
@@ -234,8 +262,30 @@ Card* LD(char* filepath)
           }
 
     };
-
     return head;
+
+}
+char getCharSuit(int Suit) {
+    char suit;
+    switch (Suit) {
+        case H:
+            suit = 'H';
+            break;
+        case C:
+            suit = 'C';
+            break;
+        case D:
+            suit = 'D';
+            break;
+        case S:
+            suit = 'S';
+            break;
+        default:
+            // handle error condition here
+            break;
+
+    }
+    return suit;
 }
 enum Suit getSuit(char suit)
 {
