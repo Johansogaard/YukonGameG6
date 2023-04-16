@@ -44,7 +44,7 @@ int main() {
 
 
     makeBoard(input,messenge);
-    while (1)
+    while (true)
     {
 
         fgets(input, sizeof(input), stdin);
@@ -114,8 +114,6 @@ char* doCommand(char *command, char* parameter)
         sprintf(tempstring, "saved deck to %s", parameter); //error
         strcpy(messenge, tempstring);
     }
-
-
 
     else
     {
@@ -200,9 +198,6 @@ void makeBoard(char *lc,char *msg)
 
 
 
-
-
-
 }
 void printList(Card* c)
 {
@@ -261,7 +256,7 @@ Card* LD(char* filepath)
 
     return head;
 }
-
+//saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
     FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
@@ -269,9 +264,9 @@ void saveList(Card *head, char *filename) {
         return;
     }
 
-    // iterate over each card in the linked list and write its rank and suit to the file
+
     while (head != NULL) {
-        fprintf(fp, "%c%c ", RankIntToChar(head->rank), SuitIntToChar(head->suit));
+        fprintf(fp, "%c%c \n", RankIntToChar(head->rank), SuitIntToChar(head->suit));
         head = head->nextCard;
     }
 
@@ -344,6 +339,53 @@ int getValue(char value)
                 return -1;  // return -1 if the character is not recognized
         }
 }
+
+char RankIntToChar(int rank) {
+    switch (rank) {
+        case A:
+            return 'A';
+        case TWO:
+            return '2';
+        case THREE:
+            return '3';
+        case FOUR:
+            return '4';
+        case FIVE:
+            return '5';
+        case SIX:
+            return '6';
+        case SEVEN:
+            return '7';
+        case EIGHT:
+            return '8';
+        case NINE:
+            return '9';
+        case TEN:
+            return 'T';
+        case J:
+            return 'J';
+        case Q:
+            return 'Q';
+        case K:
+            return 'K';
+        default:
+            return 'Error converting Rank';
+    }
+}
+char SuitIntToChar(int suit) {
+    switch (suit) {
+        case C:
+            return 'C';
+        case D:
+            return 'D';
+        case H:
+            return 'H';
+        case S:
+            return 'S';
+        default:
+            return 'Error converting suit';  // return an error message if the integer is not recognized
+    }
+}
 void shuffleList(Card* head)
 {
     int count = 0;
@@ -392,49 +434,3 @@ void swapCards(Card* card1, Card* card2)
     card2->suit = temp_suit;
 }
 
-char RankIntToChar(int rank) {
-    switch (rank) {
-        case A:
-            return 'A';
-        case TWO:
-            return '2';
-        case THREE:
-            return '3';
-        case FOUR:
-            return '4';
-        case FIVE:
-            return '5';
-        case SIX:
-            return '6';
-        case SEVEN:
-            return '7';
-        case EIGHT:
-            return '8';
-        case NINE:
-            return '9';
-        case TEN:
-            return 'T';
-        case J:
-            return 'J';
-        case Q:
-            return 'Q';
-        case K:
-            return 'K';
-        default:
-            return 'Error converting Rank';
-    }
-}
-char SuitIntToChar(int suit) {
-    switch (suit) {
-        case C:
-            return 'C';
-        case D:
-            return 'D';
-        case H:
-            return 'H';
-        case S:
-            return 'S';
-        default:
-            return 'Error converting suit';  // return an error message if the integer is not recognized
-    }
-}
