@@ -1,16 +1,20 @@
 #include <stdio.h>
-#include <process.h>
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 
 
 enum Suit{H,C,D,S};
+enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
+char messenge[50] = "";
+char lastCommand[50] = "";
 //the struct that symbolize a card
 typedef struct Cards {
-    int rank;
+    enum Rank rank;
     enum Suit suit;
+    bool hidden;
     struct Cards* nextCard;
+
 }Card;
 
 //define c1-c7
@@ -30,30 +34,35 @@ void shuffleList(Card *head);
 void makeBoard(char *lc,char *msg);
 void printFrow(int row);
 char* doCommand(char *command);
+char RankIntToChar(int rank);
+char SuitIntToChar(int suit);
+void saveList(Card *head, char *filename);
 int main() {
 
 
-    makeBoard("","");
+    makeBoard(lastCommand,messenge);
     while (1)
     {
-        char lastCommand[50];
+
         fgets(lastCommand,sizeof(lastCommand),stdin);
         //removes the newline charcter that fgets adds to the line
-         lastCommand[strcspn(lastCommand, "\n")] = '\0';
-         //adds a line between each new print gameboard
-          printf("\n");
-          //does the command
-          doCommand(&lastCommand);
-          //makes a new board
-          makeBoard(lastCommand, doCommand(lastCommand));
+        lastCommand[strcspn(lastCommand, "\n")] = '\0';
+        //adds a line between each new print gameboard
+        printf("\n");
+        //does the commandLD
+        doCommand(lastCommand);
+        //makes a new board
+        makeBoard(lastCommand, messenge);
+        printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
+        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );
     }
 
-   struct Card* deck;
+    struct Card* deck;
 
 
-   int num_cards;
-   char filepath[] = "C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt";
-  // deck = LD(filepath);
+    int num_cards;
+    char filepath[] = "/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt";
+    // deck = LD(filepath);
 
 
     /*printf("\nUnshuffled list\n");
@@ -67,22 +76,22 @@ int main() {
 char* doCommand(char *command)
 {
 
-  if(strcmp(command, "start") == 0){
-      return "ok";
+    if(strcmp(command, "start") == 0){
+        strcpy(messenge, "OK");
     } else if(command[0] == 'L'&& command[1]=='D')
-  {
-      if(sizeof(command)<3)
-      {
-          LD(&command[3]);
-      } else
-      {
-          LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
-      }
-  }
-  else
-  {
-      return "Command not found";
-  }
+    {
+        if(sizeof(command)<3)
+        {
+            LD(&command[3]);
+        } else
+        {
+            LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+        }
+    }
+    else
+    {
+        strcpy(messenge, "unknown command");
+    }
 
 }
 void printFrow(int row)
@@ -143,19 +152,19 @@ void makeBoard(char *lc,char *msg)
     int row = 0;
     bool isemtpy = false;
 
-   while((isemtpy == false) || (row<4)){
-         isemtpy = true;
+    while((isemtpy == false) || (row<4)){
+        isemtpy = true;
         isemtpy = printCCard(c1,row,isemtpy);
-         isemtpy = printCCard(c2,row,isemtpy);
-       isemtpy = printCCard(c3,row,isemtpy);
-       isemtpy = printCCard(c4,row,isemtpy);
-       isemtpy = printCCard(c5,row,isemtpy);
-       isemtpy = printCCard(c6,row,isemtpy);
-       isemtpy = printCCard(c7,row,isemtpy);
-       printFrow(row);
-       printf("\n");
-       row++;
-     }
+        isemtpy = printCCard(c2,row,isemtpy);
+        isemtpy = printCCard(c3,row,isemtpy);
+        isemtpy = printCCard(c4,row,isemtpy);
+        isemtpy = printCCard(c5,row,isemtpy);
+        isemtpy = printCCard(c6,row,isemtpy);
+        isemtpy = printCCard(c7,row,isemtpy);
+        printFrow(row);
+        printf("\n");
+        row++;
+    }
     printf("LAST Command:%s",lc);
     printf("\nMessage:%s\n",msg);
     printf("INPUT >");
@@ -171,24 +180,8 @@ void printList(Card* c)
     int i =0;
     while (c != NULL) {
         i++;
-        printf("%d, %d, ", i, c->rank);
-        switch (c->suit) {
-            case H:
-                printf("H\n");
-                break;
-            case C:
-                printf("C\n");
-                break;
-            case D:
-                printf("D\n");
-                break;
-            case S:
-                printf("S\n");
-                break;
-            default:
-                printf("Unknown suit\n");
-                break;
-        }
+        printf(" %c, %c\n", RankIntToChar(c->rank), SuitIntToChar(c->suit));
+
         c = c->nextCard;
     }
 }
@@ -207,36 +200,55 @@ Card* LD(char* filepath)
         exit(1);
 
     }
-   // struct Card* cards = malloc(capacity* sizeof(struct Card));
+    // struct Card* cards = malloc(capacity* sizeof(struct Card));
 
 
     //reading the whole file to end
-       Card* head = NULL;
-      Card* cardBefore= NULL;
-        int i = 0;
-      while  (fgets(singleLine,150,fPointer) !=NULL){
+    Card* head = NULL;
+    Card* cardBefore= NULL;
+    int i = 0;
+    while  (fgets(singleLine,150,fPointer) !=NULL){
 
-          if(head==NULL)
-          {
-              head = malloc(sizeof(Card));
-              head->suit = getSuit(singleLine[2]);
-              head->rank = getValue(singleLine[0]);
-              cardBefore = head;
-          }
-          else
-          {
+        if(head==NULL)
+        {
+            head = malloc(sizeof(Card));
+            head->suit = getSuit(singleLine[2]);
+            head->hidden=false;
+            head->rank = getValue(singleLine[0]);
+            cardBefore = head;
+        }
+        else
+        {
 
-              Card* newCard =malloc(sizeof( Card));
-              cardBefore->nextCard=newCard;
-              newCard->suit = getSuit(singleLine[2]);
-              newCard->rank = getValue(singleLine[0]);
-              cardBefore = newCard;
-          }
+            Card* newCard =malloc(sizeof( Card));
+            cardBefore->nextCard=newCard;
+            newCard->suit = getSuit(singleLine[2]);
+            head->hidden=false;
+            newCard->rank = getValue(singleLine[0]);
+            cardBefore = newCard;
+        }
 
     };
 
     return head;
 }
+
+void saveList(Card *head, char *filename) {
+    FILE *fp = fopen(filename, "w");
+    if (fp == NULL) {
+        printf("Failed to open file\n");
+        return;
+    }
+
+    // iterate over each card in the linked list and write its rank and suit to the file
+    while (head != NULL) {
+        fprintf(fp, "%c%c ", RankIntToChar(head->rank), SuitIntToChar(head->suit));
+        head = head->nextCard;
+    }
+
+    fclose(fp);
+}
+
 enum Suit getSuit(char suit)
 {
     enum Suit s;
@@ -262,38 +274,46 @@ enum Suit getSuit(char suit)
 }
 int getValue(char value)
 {
-    int v;
-    int valueToCheck = atoi(&value);
-    //getting the value
-    if(valueToCheck<10 && valueToCheck>1) {
-        v = valueToCheck;
-    }
-    else
-    {
+
         switch (value) {
-            case 'T':
-                v = 10;
-                break;
             case 'A':
-                v = 1;
-                break;
+                return A;
+            case '2':
+                return TWO;
+            case '3':
+                return THREE;
+            case '4':
+                return FOUR;
+            case '5':
+                return FIVE;
+            case '6':
+                return SIX;
+            case '7':
+                return SEVEN;
+            case '8':
+                return EIGHT;
+            case '9':
+                return NINE;
+            case 'T':
+                return TEN;
             case 'J':
-                v = 11;
-                break;
+                return J;
             case 'Q':
-                v = 12;
-                break;
+                return Q;
             case 'K':
-                v = 13;
-                break;
+                return K;
+            case 'C':
+                return C;
+            case 'D':
+                return D;
+            case 'H':
+                return H;
+            case 'S':
+                return S;
             default:
-                // handle error condition here
-                break;
-
+                printf("Error: invalid rank '%c' in input file\n", value);
+                return -1;  // return -1 if the character is not recognized
         }
-    }
-    return v;
-
 }
 void shuffleList(Card* head)
 {
@@ -343,9 +363,49 @@ void swapCards(Card* card1, Card* card2)
     card2->suit = temp_suit;
 }
 
-
-
-
-
-
-
+char RankIntToChar(int rank) {
+    switch (rank) {
+        case A:
+            return 'A';
+        case TWO:
+            return '2';
+        case THREE:
+            return '3';
+        case FOUR:
+            return '4';
+        case FIVE:
+            return '5';
+        case SIX:
+            return '6';
+        case SEVEN:
+            return '7';
+        case EIGHT:
+            return '8';
+        case NINE:
+            return '9';
+        case TEN:
+            return 'T';
+        case J:
+            return 'J';
+        case Q:
+            return 'Q';
+        case K:
+            return 'K';
+        default:
+            return 'Error converting Rank';
+    }
+}
+char SuitIntToChar(int suit) {
+    switch (suit) {
+        case C:
+            return 'C';
+        case D:
+            return 'D';
+        case H:
+            return 'H';
+        case S:
+            return 'S';
+        default:
+            return 'Error converting suit';  // return an error message if the integer is not recognized
+    }
+}
