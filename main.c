@@ -6,8 +6,8 @@
 
 enum Suit{H,C,D,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
-char messenge[50] = "";
-char lastCommand[50] = "";
+char messenge[100] = "";
+char input[100] = "";
 //the struct that symbolize a card
 typedef struct Cards {
     enum Rank rank;
@@ -16,6 +16,9 @@ typedef struct Cards {
     struct Cards* nextCard;
 
 }Card;
+
+Card* Deck;
+
 
 //define c1-c7
 Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
@@ -33,28 +36,37 @@ Card *getCardAtIndex(Card *head, int index);
 void shuffleList(Card *head);
 void makeBoard(char *lc,char *msg);
 void printFrow(int row);
-char* doCommand(char *command);
+char* doCommand(char *command, char* parameter);
 char RankIntToChar(int rank);
 char SuitIntToChar(int suit);
 void saveList(Card *head, char *filename);
 int main() {
 
 
-    makeBoard(lastCommand,messenge);
+    makeBoard(input,messenge);
     while (1)
     {
 
-        fgets(lastCommand,sizeof(lastCommand),stdin);
-        //removes the newline charcter that fgets adds to the line
-        lastCommand[strcspn(lastCommand, "\n")] = '\0';
-        //adds a line between each new print gameboard
-        printf("\n");
+        fgets(input, sizeof(input), stdin);
+
+        // remove the newline character at the end of the input
+        input[strcspn(input, "\n")] = 0;
+
+        // tokenize the input string to extract the command and parameter
+        char *command = strtok(input, " ");
+        char *parameter = strtok(NULL, " ");
+
+        if (strcmp(command, "QQ") == 0) {
+            printf("\ngame shutting down\n");
+            break;
+        }
         //does the commandLD
-        doCommand(lastCommand);
+        //printf("%s",parameter);
+        doCommand(command, parameter);
         //makes a new board
-        makeBoard(lastCommand, messenge);
-        printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
-        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );
+        makeBoard(command, messenge);
+        /*printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
+        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
 
     struct Card* deck;
@@ -73,21 +85,38 @@ int main() {
     */
 
 }
-char* doCommand(char *command)
+char* doCommand(char *command, char* parameter)
 {
+    char tempstring [100];
 
     if(strcmp(command, "start") == 0){
         strcpy(messenge, "OK");
-    } else if(command[0] == 'L'&& command[1]=='D')
+    }
+
+    else if(strcmp(command, "LD") == 0)
     {
-        if(sizeof(command)<3)
+        if( parameter == NULL)
         {
-            LD(&command[3]);
+            Deck=LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+            strcpy(messenge, "loaded normal deck");
         } else
         {
-            LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+            Deck=LD(parameter);
+
+            sprintf(tempstring, "loaded deck from %s", parameter);
+            strcpy(messenge, tempstring);
+
         }
     }
+
+    else if(strcmp(command, "SD") == 0){
+        saveList(Deck, parameter);
+        sprintf(tempstring, "saved deck to %s", parameter); //error
+        strcpy(messenge, tempstring);
+    }
+
+
+
     else
     {
         strcpy(messenge, "unknown command");
