@@ -15,6 +15,33 @@ typedef struct Cards {
     bool hidden;
     struct Cards* nextCard;
 
+/*int isBlack(Cards card) {
+	return card.Suit == C || card.Suit == S;
+}
+
+int isRed(Cards card) {
+	return card.Suit == H || card.Suit == D;
+}
+
+int isDifferentColor(Cards higher, Cards lower) {
+	return isBlack(higher) != isBlack(lower);
+}
+
+int inSequence(Cards lower, Cards higher) {
+	return higher.Rank == lower.Rank + 1;
+}
+
+int CanBePlaced(Cards lower, Cards higher) {
+	return isDifferentColor(higher, lower) && inSequence(lower, higher);
+}
+
+int isSameSuit(card first, card second) {
+	return first.suit == second.suit;
+}
+
+int canBePlacedFoundation(card parent, card child) {
+	return isSameSuit(parent, child) && isInSequence(parent, child);
+}*/
 }Card;
 
 Card* Deck;
@@ -393,7 +420,7 @@ void Split(Card* deck, int split) {
         current->nextCard = pile2;
     }
     sprintf(messenge, "Deck split with parameter %d", split);
-    deck=shuffled;
+    deck=current;
 }
 
 enum Suit getSuit(char suit)
