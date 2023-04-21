@@ -41,7 +41,7 @@ char* doCommand(char *command, char* parameter);
 char RankIntToChar(int rank);
 char SuitIntToChar(int suit);
 void saveList(Card *head, char *filename);
-char* doCommand(char *command);
+
 void addCards(Card *cards);
 char getCharSuit(int Suit);
 int main() {
@@ -132,11 +132,11 @@ char* doCommand(char *command, char* parameter)
     {
         if( parameter == NULL)
         {
-            Deck=LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+            addCards(LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt"));
             strcpy(messenge, "loaded normal deck");
         } else
         {
-            Deck=LD(parameter);
+            addCards(LD(parameter));
 
             sprintf(tempstring, "loaded deck from %s", parameter);
             strcpy(messenge, tempstring);
@@ -198,7 +198,7 @@ void printFrow(int row)
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
     {
-        printf("%d%d\t", getCardAtIndex(c1,row)->rank,getCardAtIndex(c1,row)->suit);
+        printf("%c%c\t", RankIntToChar(getCardAtIndex(c,row)->rank), SuitIntToChar(getCardAtIndex(c,row)->suit));
         return false;
     }else{
 
@@ -239,7 +239,7 @@ void printList(Card* c)
     int i =0;
     while (c != NULL) {
         i++;
-        printf(" %c, %c\n", RankIntToChar(c->rank), SuitIntToChar(c->suit));
+        printf(" %c,%c\n", RankIntToChar(c->rank), SuitIntToChar(c->suit));
 
         c = c->nextCard;
     }
