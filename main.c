@@ -40,6 +40,8 @@ char* doCommand(char *command, char* parameter);
 char RankIntToChar(int rank);
 char SuitIntToChar(int suit);
 void saveList(Card *head, char *filename);
+void split(Card *deck, int n, int split);
+int numCards(Card* deck);
 int main() {
 
 
@@ -65,8 +67,8 @@ int main() {
         doCommand(command, parameter);
         //makes a new board
         makeBoard(command, messenge);
-        /*printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
-        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
+        printList(Deck);
+        saveList(LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt"),"/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/savecards.txt" );
     }
 
     struct Card* deck;
@@ -81,8 +83,8 @@ int main() {
     printList(deck);
     printf("\nshuffled list\n");
     shuffleList(deck);
-    printList(deck);
-    */
+    printList(deck);*/
+
 
 }
 char* doCommand(char *command, char* parameter)
@@ -97,13 +99,31 @@ char* doCommand(char *command, char* parameter)
     {
         if( parameter == NULL)
         {
-            Deck=LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+            Deck=LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
             strcpy(messenge, "loaded normal deck");
         } else
         {
             Deck=LD(parameter);
 
             sprintf(tempstring, "loaded deck from %s", parameter);
+            strcpy(messenge, tempstring);
+
+        }
+    }
+    else if(strcmp(command, "split") == 0){
+        if( parameter == NULL)
+        {
+            Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
+            split(deck, numCards(deck), 26);
+
+
+            strcpy(messenge, "Loaded and split new deck");
+        } else
+        {
+
+            split(Deck, numCards(Deck), 26);
+
+            sprintf(tempstring, "Split current deck", parameter);
             strcpy(messenge, tempstring);
 
         }
@@ -432,5 +452,61 @@ void swapCards(Card* card1, Card* card2)
     card1->suit = card2->suit;
     card2->rank = temp_rank;
     card2->suit = temp_suit;
+}
+//Helper function for split function
+int numCards(Card* deck) {
+    int count = 0;
+    Card* current = deck;
+    while (current != NULL) {
+        count++;
+        current = current->nextCard;
+    }
+    return count;
+}
+
+
+void split(Card *deck, int n, int split) {
+    Card *pile1 = deck;
+    Card *pile2 = deck;
+    int i, p1_len;
+
+    p1_len = (split > 0 && split < n) ? split : (rand() % n);
+
+    for (i = 1; i < p1_len; i++) {
+        pile2 = pile2->nextCard;
+    }
+    Card *temp = pile2->nextCard;
+    pile2->nextCard = NULL;
+    pile2 = temp;
+
+    Card *shuffled = NULL;
+    Card *current = NULL;
+    while (pile1 != NULL && pile2 != NULL) {
+        if (rand() % 2 == 0) {
+            if (shuffled == NULL) {
+                shuffled = pile1;
+                current = shuffled;
+            } else {
+                current->nextCard = pile1;
+                current = current->nextCard;
+            }
+            pile1 = pile1->nextCard;
+        } else {
+            if (shuffled == NULL) {
+                shuffled = pile2;
+                current = shuffled;
+            } else {
+                current->nextCard = pile2;
+                current = current->nextCard;
+            }
+            pile2 = pile2->nextCard;
+        }
+    }
+    if (pile1 != NULL) {
+        current->nextCard = pile1;
+    } else {
+        current->nextCard = pile2;
+    }
+    Deck = shuffled;
 }
 
