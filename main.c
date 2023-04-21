@@ -10,6 +10,7 @@ enum Suit{H,C,D,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
 char messenge[100] = "";
 char input[100] = "";
+bool playmode = false;
 //the struct that symbolize a card
 typedef struct Cards {
     enum Rank rank;
@@ -104,7 +105,7 @@ int main() {
         {addCards(Deck);}
 
         makeBoard(command, messenge);
-        printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
+        printList(Deck);
         /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
 
@@ -157,7 +158,7 @@ void addCards(Card *cards)
 }
 char* doCommand(char *command, char* parameter)
 {
-    char tempstring [100];
+    if(!playmode){
 
     if(strcmp(command, "start") == 0){
         strcpy(messenge, "OK");
@@ -224,12 +225,27 @@ char* doCommand(char *command, char* parameter)
 
         strcpy(messenge, "Here is the deck");}
 
+    else if (strcmp(command, "P") == 0){
+        strcpy(messenge, "Game is in playphase");
+        playmode=true;
+    }
+
     else
     {
         strcpy(messenge, "unknown command");
     }
+    }
+
+    else{
+        if (strcmp(command, "Q") == 0){
+            strcpy(messenge, "Game is in startup phase");
+            playmode=false;
+
+        }
+        }
 
 }
+
 void printFrow(int row)
 {
 
