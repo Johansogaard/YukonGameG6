@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
 
 
 enum Suit{H,C,D,S};
@@ -69,7 +71,8 @@ void saveList(Card *head, char *filename);
 void shuffleList(Card* head);
 void Split(Card* deck, int split);
 int getlength(Card* head);
-
+void addCards(Card *cards);
+char getCharSuit(int Suit);
 int main() {
 
 
@@ -95,8 +98,8 @@ int main() {
         doCommand(command, parameter);
         //makes a new board
         makeBoard(command, messenge);
-        printList(Deck);
-        /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
+        /*printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
+        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
 
     struct Card* deck;
@@ -115,9 +118,40 @@ int main() {
     */
 
 }
+void addCards(Card *cards)
+{
+    int row=0;
+    int i =0;
+    Card *c[] = {c1,c2,c3,c4,c5,c6,c7};
+    for (int j = 0; j < (sizeof(c)/sizeof(c1)) ; ++j) {
+        c[j] = cards;
+
+        cards = cards->nextCard;
+    }
+    while (cards!=NULL)
+    {
+        getCardAtIndex(c[i],row)->nextCard = cards;
+        cards = cards->nextCard;
+        getCardAtIndex(c[i],row+1)->nextCard=NULL;
+        i = (i+1);
+        if(i ==7)
+        {
+            row = row+1;
+        }
+        i = i%7;
+
+    }
+    c1 = c[0];
+    c2 = c[1];
+    c3 = c[2];
+    c4 = c[3];
+    c5 = c[4];
+    c6 = c[5];
+    c7 = c[6];
+}
 char* doCommand(char *command, char* parameter)
 {
-
+    char tempstring [100];
 
     if(strcmp(command, "start") == 0){
         strcpy(messenge, "OK");
@@ -142,7 +176,6 @@ char* doCommand(char *command, char* parameter)
     }
 
     else if(strcmp(command, "SD") == 0){
-
         saveList(Deck, parameter);
 
 
@@ -221,7 +254,7 @@ void printFrow(int row)
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
     {
-        printf("%d%d\t", getCardAtIndex(c1,row)->rank,getCardAtIndex(c1,row)->suit);
+        printf("%c%c\t", RankIntToChar(getCardAtIndex(c,row)->rank), SuitIntToChar(getCardAtIndex(c,row)->suit));
         return false;
     }else{
 
@@ -237,19 +270,19 @@ void makeBoard(char *lc,char *msg)
     int row = 0;
     bool isemtpy = false;
 
-    while((isemtpy == false) || (row<4)){
-        isemtpy = true;
-        isemtpy = printCCard(c1,row,isemtpy);
-        isemtpy = printCCard(c2,row,isemtpy);
-        isemtpy = printCCard(c3,row,isemtpy);
+   while((isemtpy == false) || (row<4)){
+         isemtpy = true;
+         isemtpy = printCCard(c1,row,isemtpy);
+         isemtpy = printCCard(c2,row,isemtpy);
+         isemtpy = printCCard(c3,row,isemtpy);
         isemtpy = printCCard(c4,row,isemtpy);
-        isemtpy = printCCard(c5,row,isemtpy);
-        isemtpy = printCCard(c6,row,isemtpy);
-        isemtpy = printCCard(c7,row,isemtpy);
-        printFrow(row);
-        printf("\n");
-        row++;
-    }
+       isemtpy = printCCard(c5,row,isemtpy);
+       isemtpy = printCCard(c6,row,isemtpy);
+       isemtpy = printCCard(c7,row,isemtpy);
+       printFrow(row);
+       printf("\n");
+       row++;
+     }
     printf("LAST Command:%s",lc);
     printf("\nMessage:%s\n",msg);
     printf("INPUT >");
@@ -296,7 +329,7 @@ Card* LD(char* filepath)
         {
             head = malloc(sizeof(Card));
             head->suit = getSuit(singleLine[2]);
-            head->hidden=false;
+            head->hidden=true;
             head->rank = getValue(singleLine[0]);
             cardBefore = head;
         }
@@ -306,14 +339,37 @@ Card* LD(char* filepath)
             Card* newCard =malloc(sizeof( Card));
             cardBefore->nextCard=newCard;
             newCard->suit = getSuit(singleLine[2]);
-            head->hidden=false;
+            head->hidden=true;
             newCard->rank = getValue(singleLine[0]);
             cardBefore = newCard;
         }
 
     };
-
+      cardBefore->nextCard=NULL;
     return head;
+
+}
+char getCharSuit(int Suit) {
+    char suit;
+    switch (Suit) {
+        case H:
+            suit = 'H';
+            break;
+        case C:
+            suit = 'C';
+            break;
+        case D:
+            suit = 'D';
+            break;
+        case S:
+            suit = 'S';
+            break;
+        default:
+            // handle error condition here
+            break;
+
+    }
+    return suit;
 }
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
