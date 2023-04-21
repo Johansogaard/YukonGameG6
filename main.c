@@ -13,6 +13,7 @@ typedef struct Cards {
     int rank;
     enum Suit suit;
     struct Cards* nextCard;
+    bool isVisible;
 
 }Card;
 
@@ -82,13 +83,15 @@ void addCards(Card *cards)
     while (cards!=NULL)
     {
         getCardAtIndex(c[i],row)->nextCard = cards;
+        cards = cards->nextCard;
+        getCardAtIndex(c[i],row+1)->nextCard=NULL;
         i = (i+1);
         if(i ==7)
         {
             row = row+1;
         }
         i = i%7;
-        cards = cards->nextCard;
+
     }
     c1 = c[0];
     c2 = c[1];
