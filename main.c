@@ -418,7 +418,6 @@ void saveList(Card *head, char *filename) {
 
 
 
-//ShuffleList - using double pointers, because
 void shuffleList(Card* head) {
     if (head==NULL){
         strcpy(messenge, "No deck");
