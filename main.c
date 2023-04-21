@@ -73,6 +73,9 @@ void Split(Card* deck, int split);
 int getlength(Card* head);
 void addCards(Card *cards);
 char getCharSuit(int Suit);
+void SW(Card* head);
+
+
 int main() {
 
 
@@ -97,9 +100,12 @@ int main() {
         //printf("%s",parameter);
         doCommand(command, parameter);
         //makes a new board
+        if(Deck!=NULL)
+        {addCards(Deck);}
+
         makeBoard(command, messenge);
-        /*printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
-        saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
+        printList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"));
+        /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
 
     struct Card* deck;
@@ -157,6 +163,7 @@ char* doCommand(char *command, char* parameter)
         strcpy(messenge, "OK");
     }
 
+
     else if(strcmp(command, "LD") == 0)
     {
         if( parameter == NULL)
@@ -164,15 +171,17 @@ char* doCommand(char *command, char* parameter)
             strcpy(messenge, "loaded normal deck");
             Deck=LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
 
-        } else
+        }
+
+
+        else
         {
             sprintf(messenge, "loaded deck from %s", parameter);
 
             Deck=LD(parameter);
 
-
-
         }
+
     }
 
     else if(strcmp(command, "SD") == 0){
@@ -189,6 +198,8 @@ char* doCommand(char *command, char* parameter)
         }
         if (parameter == NULL) {
             Split(Deck, rand() % getlength(Deck));
+
+
         } else {
         char *endptr;
         long int value = strtol(parameter, &endptr, 10);
@@ -199,12 +210,19 @@ char* doCommand(char *command, char* parameter)
         } else {
             // parameter is a valid integer, use it in your function
             Split(Deck, value);
-        }}}
+        }
+        }
+    }
 
 
     else if (strcmp(command, "SR") == 0) {
     shuffleList(Deck);
     strcpy(messenge, "shuffled cards");}
+
+    else if (strcmp(command, "SW") == 0) {
+        SW(Deck);
+
+        strcpy(messenge, "Here is the deck");}
 
     else
     {
@@ -343,9 +361,9 @@ Card* LD(char* filepath)
         {
 
             Card* newCard =malloc(sizeof( Card));
+            newCard->hidden=true;
             cardBefore->nextCard=newCard;
             newCard->suit = getSuit(singleLine[2]);
-            head->hidden=true;
             newCard->rank = getValue(singleLine[0]);
             cardBefore = newCard;
         }
@@ -483,6 +501,16 @@ void Split(Card* deck, int split) {
     }
     sprintf(messenge, "Deck split with parameter %d", split);
     deck=current;
+}
+
+void SW(Card* head) {
+    Card* starthead=head;
+    Card* current = head;
+    while (current != NULL) {
+        current->hidden = false;
+        current = current->nextCard;
+    }
+    Deck=starthead;
 }
 
 enum Suit getSuit(char suit)
