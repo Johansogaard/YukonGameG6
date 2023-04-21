@@ -198,8 +198,14 @@ void printFrow(int row)
 bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndex(c,row)!=NULL)
     {
-        printf("%c%c\t", RankIntToChar(getCardAtIndex(c,row)->rank), SuitIntToChar(getCardAtIndex(c,row)->suit));
-        return false;
+        if(getCardAtIndex(c,row)->hidden==false) {
+            printf("%c%c\t", RankIntToChar(getCardAtIndex(c, row)->rank), SuitIntToChar(getCardAtIndex(c, row)->suit));
+            return false;
+        } else
+        {
+            printf("[]\t");
+            return false;
+        }
     }else{
 
         printf("\t");
