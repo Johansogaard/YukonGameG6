@@ -73,7 +73,7 @@ void saveList(Card *head, char *filename);
 void shuffleList(Card* head);
 void Split(Card* deck, int split);
 int getlength(Card* head);
-void addCards(Card *cards);
+void addCards(Card *cards, bool playmode);
 char getCharSuit(int Suit);
 void SW(Card* head);
 Card *getCardAtIndexInCol(Card *head, int index);
@@ -103,9 +103,13 @@ int main() {
         //printf("%s",parameter);
         doCommand(command, parameter);
         //makes a new board
-        if(Deck!=NULL)
-        {addCards(Deck);}
-
+        if (Deck != NULL) {
+            if (playmode) {
+                addCards(Deck, true);
+            } else {
+                addCards(Deck, false);
+            }
+        }
         makeBoard(command, messenge);
 
         /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
@@ -127,29 +131,35 @@ int main() {
     */
 
 }
-void addCards(Card *cards)
+void addCards(Card *cards, bool playmode)
 {
-    int row=0;
-    int i =0;
-    Card *c[] = {c1,c2,c3,c4,c5,c6,c7};
-    for (int j = 0; j < (sizeof(c)/sizeof(c1)) ; ++j) {
-        c[j] = cards;
+    int row = 0;
+    int i = 0;
+    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
 
-        cards = cards->nextCardDec;
+    if (playmode) {
+        int numCards[] = {1, 6, 7, 8, 9, 10, 11};
+        for (int j = 6; j >= 0; j--) {
+            for (int k = 0; k < numCards[j]; k++) {
+                c[j] = cards;
+                cards = cards->nextCardDec;
+            }
+        }
+    } else {
+        for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
+            c[j] = cards;
+            cards = cards->nextCardDec;
+        }
     }
 
-    while (cards!=NULL)
-    {
-        getCardAtIndexInCol(c[i],row)->nextCardCol = cards;
+    while (cards != NULL) {
+        getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
         cards = cards->nextCardDec;
-        getCardAtIndexInCol(c[i],row+1)->nextCardCol=NULL;
-        i = (i+1);
-        if(i ==7)
-        {
-            row = row+1;
+        getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
+        i = (i + 1) % 7;
+        if (i == 0) {
+            row++;
         }
-        i = i%7;
-
     }
 
     c1 = c[0];
@@ -159,9 +169,9 @@ void addCards(Card *cards)
     c5 = c[4];
     c6 = c[5];
     c7 = c[6];
-
-
 }
+
+
 char* doCommand(char *command, char* parameter)
 {
     if(!playmode){
@@ -176,7 +186,7 @@ char* doCommand(char *command, char* parameter)
         if( parameter == NULL)
         {
             strcpy(messenge, "loaded normal deck");
-            Deck=LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
+            Deck=LD("/Users/andersjefsen/CLionProjects/YukonGameG6/deckofcards.txt");
 
         }
 
@@ -262,28 +272,28 @@ void printFrow(int row)
                 toPrint[0] = f1->rank;
                 toPrint[1] = f1->suit + 'H';
             }
-            printf("%s    F1", toPrint);
+            printf("%8s   F1", toPrint);
             break;
         case 1:
             if (f2!= NULL) {
                 toPrint[0] =f2->rank;
                 toPrint[1] =f2->suit + 'H';
             }
-            printf("%s    F2", toPrint);
+            printf("%8s   F2", toPrint);
             break;
         case 2:
             if (f3 != NULL) {
                 toPrint[0] = f3->rank;
                 toPrint[1] =f3->suit + 'H';
             }
-            printf("%s    F3", toPrint);
+            printf("%8s   F3", toPrint);
             break;
         case 3:
             if (f4 != NULL) {
                 toPrint[0] = f4->rank;
                 toPrint[1] = f4->suit + 'H';
             }
-            printf("%s    F4", toPrint);
+            printf("%8s   F4", toPrint);
             break;
         default:
             // handle error condition
@@ -310,7 +320,7 @@ bool printCCard(Card *c,int row,bool isEmpty) {
 }
 void makeBoard(char *lc,char *msg)
 {
-    printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n");
+    printf("C1\tC2\tC3\tC4\tC5\tC6\tC7\n\n");
 
 
     int row = 0;
@@ -330,7 +340,7 @@ void makeBoard(char *lc,char *msg)
        row++;
      }
     printf("LAST Command:%s",lc);
-    printf("\nMessage:%s\n",msg);
+    printf("\nMessage: %s\n",msg);
     printf("INPUT >");
 
 
