@@ -2,19 +2,50 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
 
 
 enum Suit{H,C,D,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
 char messenge[100] = "";
 char input[100] = "";
+bool playmode = false;
 //the struct that symbolize a card
 typedef struct Cards {
     enum Rank rank;
     enum Suit suit;
     bool hidden;
-    struct Cards* nextCard;
+    struct Cards *nextCardDec;
+    struct Cards *nextCardCol;
 
+/*int isBlack(Cards card) {
+	return card.Suit == C || card.Suit == S;
+}
+
+int isRed(Cards card) {
+	return card.Suit == H || card.Suit == D;
+}
+
+int isDifferentColor(Cards higher, Cards lower) {
+	return isBlack(higher) != isBlack(lower);
+}
+
+int inSequence(Cards lower, Cards higher) {
+	return higher.Rank == lower.Rank + 1;
+}
+
+int CanBePlaced(Cards lower, Cards higher) {
+	return isDifferentColor(higher, lower) && inSequence(lower, higher);
+}
+
+int isSameSuit(card first, card second) {
+	return first.suit == second.suit;
+}
+
+int canBePlacedFoundation(card parent, card child) {
+	return isSameSuit(parent, child) && isInSequence(parent, child);
+}*/
 }Card;
 
 Card* Deck;
@@ -32,16 +63,22 @@ enum Suit getSuit(char suit);
 int getValue(char value);
 void printList(Card *c);
 void swapCards(Card* card1, Card* card2);
-Card *getCardAtIndex(Card *head, int index);
-void shuffleList(Card *head);
+Card *getCardAtIndexInDeck(Card *head, int index);
 void makeBoard(char *lc,char *msg);
 void printFrow(int row);
 char* doCommand(char *command, char* parameter);
 char RankIntToChar(int rank);
 char SuitIntToChar(int suit);
 void saveList(Card *head, char *filename);
-void split(Card *deck, int n, int split);
-int numCards(Card* deck);
+void shuffleList(Card* head);
+void Split(Card* deck, int split);
+int getlength(Card* head);
+void addCards(Card *cards, bool playmode);
+char getCharSuit(int Suit);
+void SW(Card* head);
+Card *getCardAtIndexInCol(Card *head, int index);
+
+
 int main() {
 
 
@@ -66,9 +103,16 @@ int main() {
         //printf("%s",parameter);
         doCommand(command, parameter);
         //makes a new board
+        if (Deck != NULL) {
+            if (playmode) {
+                addCards(Deck, true);
+            } else {
+                addCards(Deck, false);
+            }
+        }
         makeBoard(command, messenge);
-        printList(Deck);
-        saveList(LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt"),"/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/savecards.txt" );
+
+        /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
 
     struct Card* deck;
@@ -83,64 +127,141 @@ int main() {
     printList(deck);
     printf("\nshuffled list\n");
     shuffleList(deck);
-    printList(deck);*/
-
+    printList(deck);
+    */
 
 }
+void addCards(Card *cards, bool playmode)
+{
+    int row = 0;
+    int i = 0;
+    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
+
+    if (playmode) {
+        int numCards[] = {1, 6, 7, 8, 9, 10, 11};
+        for (int j = 6; j >= 0; j--) {
+            for (int k = 0; k < numCards[j]; k++) {
+                c[j] = cards;
+                cards = cards->nextCardDec;
+            }
+        }
+    } else {
+        for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
+            c[j] = cards;
+            cards = cards->nextCardDec;
+        }
+    }
+
+    while (cards != NULL) {
+        getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
+        cards = cards->nextCardDec;
+        getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
+        i = (i + 1) % 7;
+        if (i == 0) {
+            row++;
+        }
+    }
+
+    c1 = c[0];
+    c2 = c[1];
+    c3 = c[2];
+    c4 = c[3];
+    c5 = c[4];
+    c6 = c[5];
+    c7 = c[6];
+}
+
+
 char* doCommand(char *command, char* parameter)
 {
-    char tempstring [100];
+    if(!playmode){
 
     if(strcmp(command, "start") == 0){
         strcpy(messenge, "OK");
     }
 
+
     else if(strcmp(command, "LD") == 0)
     {
         if( parameter == NULL)
         {
-            Deck=LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
             strcpy(messenge, "loaded normal deck");
-        } else
+            Deck=LD("/Users/andersjefsen/CLionProjects/YukonGameG6/deckofcards.txt");
+
+        }
+
+
+        else
         {
+            sprintf(messenge, "loaded deck from %s", parameter);
+
             Deck=LD(parameter);
 
-            sprintf(tempstring, "loaded deck from %s", parameter);
-            strcpy(messenge, tempstring);
-
         }
-    }
-    else if(strcmp(command, "split") == 0){
-        if( parameter == NULL)
-        {
-            Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
-            split(deck, numCards(deck), 26);
 
-
-            strcpy(messenge, "Loaded and split new deck");
-        } else
-        {
-
-            split(Deck, numCards(Deck), 26);
-
-            sprintf(tempstring, "Split current deck", parameter);
-            strcpy(messenge, tempstring);
-
-        }
     }
 
     else if(strcmp(command, "SD") == 0){
         saveList(Deck, parameter);
-        sprintf(tempstring, "saved deck to %s", parameter); //error
-        strcpy(messenge, tempstring);
+
+
+    }
+
+    else if (strcmp(command, "SL") == 0) {
+        if (Deck == NULL) {
+            // Empty deck, nothing to split
+            strcpy(messenge, "No deck");
+            return NULL;
+        }
+        if (parameter == NULL) {
+            Split(Deck, rand() % getlength(Deck));
+
+
+        } else {
+        char *endptr;
+        long int value = strtol(parameter, &endptr, 10);
+
+        // check for errors during conversion
+        if (*endptr != '\0') {
+            printf("Invalid parameter: %s\n", parameter);
+        } else {
+            // parameter is a valid integer, use it in your function
+            Split(Deck, value);
+        }
+        }
+    }
+
+
+    else if (strcmp(command, "SR") == 0) {
+    shuffleList(Deck);
+    strcpy(messenge, "shuffled cards");}
+
+    else if (strcmp(command, "SW") == 0) {
+        SW(Deck);
+
+        strcpy(messenge, "Here is the deck");}
+
+    else if (strcmp(command, "P") == 0){
+        strcpy(messenge, "Game is in playphase");
+        playmode=true;
     }
 
     else
     {
         strcpy(messenge, "unknown command");
     }
+    }
+
+    else{
+        if (strcmp(command, "Q") == 0){
+            strcpy(messenge, "Game is in startup phase");
+            playmode=false;
+
+        }
+        }
 
 }
+
 void printFrow(int row)
 {
 
@@ -151,28 +272,28 @@ void printFrow(int row)
                 toPrint[0] = f1->rank;
                 toPrint[1] = f1->suit + 'H';
             }
-            printf("%s    F1", toPrint);
+            printf("%8s   F1", toPrint);
             break;
         case 1:
             if (f2!= NULL) {
                 toPrint[0] =f2->rank;
                 toPrint[1] =f2->suit + 'H';
             }
-            printf("%s    F2", toPrint);
+            printf("%8s   F2", toPrint);
             break;
         case 2:
             if (f3 != NULL) {
                 toPrint[0] = f3->rank;
                 toPrint[1] =f3->suit + 'H';
             }
-            printf("%s    F3", toPrint);
+            printf("%8s   F3", toPrint);
             break;
         case 3:
             if (f4 != NULL) {
                 toPrint[0] = f4->rank;
                 toPrint[1] = f4->suit + 'H';
             }
-            printf("%s    F4", toPrint);
+            printf("%8s   F4", toPrint);
             break;
         default:
             // handle error condition
@@ -181,10 +302,16 @@ void printFrow(int row)
 
 }
 bool printCCard(Card *c,int row,bool isEmpty) {
-    if(getCardAtIndex(c,row)!=NULL)
+    if(getCardAtIndexInCol(c,row)!=NULL)
     {
-        printf("%d%d\t", getCardAtIndex(c1,row)->rank,getCardAtIndex(c1,row)->suit);
-        return false;
+        if(getCardAtIndexInCol(c,row)->hidden==false) {
+            printf("%c%c\t", RankIntToChar(getCardAtIndexInCol(c, row)->rank), SuitIntToChar(getCardAtIndexInCol(c, row)->suit));
+            return false;
+        } else
+        {
+            printf("[]\t");
+            return false;
+        }
     }else{
 
         printf("\t");
@@ -193,27 +320,27 @@ bool printCCard(Card *c,int row,bool isEmpty) {
 }
 void makeBoard(char *lc,char *msg)
 {
-    printf("c1\tc2\tc3\tc4\tc5\tc6\tc7\n");
+    printf("C1\tC2\tC3\tC4\tC5\tC6\tC7\n\n");
 
 
     int row = 0;
     bool isemtpy = false;
 
-    while((isemtpy == false) || (row<4)){
-        isemtpy = true;
-        isemtpy = printCCard(c1,row,isemtpy);
-        isemtpy = printCCard(c2,row,isemtpy);
-        isemtpy = printCCard(c3,row,isemtpy);
+   while((isemtpy == false) || (row<4)){
+         isemtpy = true;
+         isemtpy = printCCard(c1,row,isemtpy);
+         isemtpy = printCCard(c2,row,isemtpy);
+         isemtpy = printCCard(c3,row,isemtpy);
         isemtpy = printCCard(c4,row,isemtpy);
-        isemtpy = printCCard(c5,row,isemtpy);
-        isemtpy = printCCard(c6,row,isemtpy);
-        isemtpy = printCCard(c7,row,isemtpy);
-        printFrow(row);
-        printf("\n");
-        row++;
-    }
+       isemtpy = printCCard(c5,row,isemtpy);
+       isemtpy = printCCard(c6,row,isemtpy);
+       isemtpy = printCCard(c7,row,isemtpy);
+       printFrow(row);
+       printf("\n");
+       row++;
+     }
     printf("LAST Command:%s",lc);
-    printf("\nMessage:%s\n",msg);
+    printf("\nMessage: %s\n",msg);
     printf("INPUT >");
 
 
@@ -226,7 +353,7 @@ void printList(Card* c)
         i++;
         printf(" %c, %c\n", RankIntToChar(c->rank), SuitIntToChar(c->suit));
 
-        c = c->nextCard;
+        c = c->nextCardDec;
     }
 }
 Card* LD(char* filepath)
@@ -239,9 +366,10 @@ Card* LD(char* filepath)
     fPointer = fopen(filepath, "r");
     //checks if the file is found
     if (fPointer == NULL) {
-        printf("Failed to open file.\n");
-        fprintf(stderr, "Error: Could not open file '%s'\n", filepath);
-        exit(1);
+
+        sprintf(messenge, "file does not exist %s", filepath);
+
+        return fPointer;
 
     }
     // struct Card* cards = malloc(capacity* sizeof(struct Card));
@@ -257,7 +385,7 @@ Card* LD(char* filepath)
         {
             head = malloc(sizeof(Card));
             head->suit = getSuit(singleLine[2]);
-            head->hidden=false;
+            head->hidden=true;
             head->rank = getValue(singleLine[0]);
             cardBefore = head;
         }
@@ -265,32 +393,156 @@ Card* LD(char* filepath)
         {
 
             Card* newCard =malloc(sizeof( Card));
-            cardBefore->nextCard=newCard;
+            newCard->hidden=true;
+            cardBefore->nextCardDec=newCard;
             newCard->suit = getSuit(singleLine[2]);
-            head->hidden=false;
             newCard->rank = getValue(singleLine[0]);
             cardBefore = newCard;
         }
 
-    };
-
+    }
+      cardBefore->nextCardDec=NULL;
     return head;
+
+}
+char getCharSuit(int Suit) {
+    char suit;
+    switch (Suit) {
+        case H:
+            suit = 'H';
+            break;
+        case C:
+            suit = 'C';
+            break;
+        case D:
+            suit = 'D';
+            break;
+        case S:
+            suit = 'S';
+            break;
+        default:
+            // handle error condition here
+            break;
+
+    }
+    return suit;
 }
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
+    if (head==NULL){
+        strcpy(messenge, "No deck");
+        return;
+    }
     FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
-        printf("Failed to open file\n");
+        sprintf(messenge, "Wrong filepath %s", filename);
         return;
     }
 
 
     while (head != NULL) {
         fprintf(fp, "%c%c \n", RankIntToChar(head->rank), SuitIntToChar(head->suit));
-        head = head->nextCard;
+        head = head->nextCardDec;
+    }
+    sprintf(messenge, "Saved deck to %s", filename);
+    fclose(fp);
+}
+
+
+
+//ShuffleList - using double pointers, because
+void shuffleList(Card* head) {
+    if (head==NULL){
+        strcpy(messenge, "No deck");
+        return;
+    }
+    //initialiser unshuffled and shuffled list. unshuffled set to original card deck, shuffled set to NULL
+    Card* unshuffled = head;
+    Card* shuffled = NULL;
+
+    //loop until unshuffled is empty, ie. original list
+    while (unshuffled != NULL) {
+        // Remove the top card from the unshuffled list, and store in new pointer: top_card
+        Card* top_card = unshuffled;
+        unshuffled = unshuffled->nextCardDec;
+        top_card->nextCardDec = NULL;
+
+        // Generate a random index between 0 and the current length of the shuffled list
+        int rand_index = 0;
+        int length = 0;
+        Card* current = shuffled;
+        while (current != NULL) {
+            length++;
+            //move current to next node on list
+            current = current->nextCardDec;
+        }
+        //generates a random integer between 0 and length
+        rand_index = rand() % (length + 1);
+
+        // Insert the removed card at the rand_index position in the shuffled list
+        if (rand_index == 0) {
+            top_card->nextCardDec = shuffled;
+            shuffled = top_card;
+        } else {
+            Card* prev = getCardAtIndexInDeck(shuffled, rand_index - 1);
+            top_card->nextCardDec = prev->nextCardDec;
+            prev->nextCardDec = top_card;
+        }
     }
 
-    fclose(fp);
+    // Replace the original unshuffled list with the shuffled list
+    Deck = shuffled;
+}
+
+void Split(Card* deck, int split) {
+
+    // Split the deck in two piles
+    Card* pile1 = deck;
+    Card* pile2 = NULL;
+    int count = 1;
+    while (count < split && pile1->nextCardDec != NULL) {
+        pile1 = pile1->nextCardDec;
+        count++;
+    }
+    pile2 = pile1->nextCardDec;
+    pile1->nextCardDec = NULL;
+
+    // Interleave the cards from the two piles into the shuffled pile
+    Card* shuffled = NULL;
+    Card* current = NULL;
+    while (pile1 != NULL && pile2 != NULL) {
+        if (shuffled == NULL) {
+            shuffled = pile1;
+            pile1 = pile1->nextCardDec;
+        } else {
+            current->nextCardDec = pile2;
+            pile2 = pile2->nextCardDec;
+            current = current->nextCardDec;
+            current->nextCardDec = pile1;
+            pile1 = pile1->nextCardDec;
+        }
+        current = current == NULL ? shuffled : current->nextCardDec;
+    }
+
+    // Add any remaining cards from the non-empty pile to the bottom of the shuffled pile
+    if (pile1 != NULL) {
+        current->nextCardDec = pile1;
+    }
+    else if (pile2 != NULL) {
+        current->nextCardDec = pile2;
+    }
+    sprintf(messenge, "Deck split with parameter %d", split);
+    deck=current;
+}
+
+void SW(Card* head) {
+    Card* starthead=head;
+    Card* current = head;
+    while (current != NULL) {
+        current->hidden = false;
+        current = current->nextCardDec;
+    }
+    Deck=starthead;
 }
 
 enum Suit getSuit(char suit)
@@ -406,35 +658,16 @@ char SuitIntToChar(int suit) {
             return 'Error converting suit';  // return an error message if the integer is not recognized
     }
 }
-void shuffleList(Card* head)
-{
-    int count = 0;
-    Card* current = head;
-    // Count the number of cards in the list
-    while (current != NULL) {
-        count++;
-        current = current->nextCard;
-    }
-    // Perform the Fisher-Yates shuffle algorithm
-    for (int i = count - 1; i > 0; i--) {
-        // Generate a random index between 0 and i (inclusive)
-        int j = rand() % (i + 1);
-        // Swap the cards at index i and j
-        Card* card_i = getCardAtIndex(head, i);
-        Card* card_j = getCardAtIndex(head, j);
-        swapCards(card_i, card_j);
-    }
-}
 
 // Helper function to get the card at a given index
-Card *getCardAtIndex(Card *head, int index)
+Card *getCardAtIndexInDeck(Card *head, int index)
 {
     if(head == NULL)
     {
         return head;
     }
     for (int i = 0; i < index; i++) {
-        head = head->nextCard;
+        head = head->nextCardDec;
         if(head == NULL)
         {
             break;
@@ -442,6 +675,23 @@ Card *getCardAtIndex(Card *head, int index)
     }
     return head;
 }
+// Helper function to get the card at a given index
+Card *getCardAtIndexInCol(Card *head, int index)
+{
+    if(head == NULL)
+    {
+        return head;
+    }
+    for (int i = 0; i < index; i++) {
+        head = head->nextCardCol;
+        if(head == NULL)
+        {
+            break;
+        }
+    }
+    return head;
+}
+
 
 // Helper function to swap two cards
 void swapCards(Card* card1, Card* card2)
@@ -453,60 +703,13 @@ void swapCards(Card* card1, Card* card2)
     card2->rank = temp_rank;
     card2->suit = temp_suit;
 }
-//Helper function for split function
-int numCards(Card* deck) {
+
+int getlength(Card* head) {
     int count = 0;
-    Card* current = deck;
+    Card* current = head;
     while (current != NULL) {
         count++;
-        current = current->nextCard;
+        current = current->nextCardDec;
     }
     return count;
 }
-
-
-void split(Card *deck, int n, int split) {
-    Card *pile1 = deck;
-    Card *pile2 = deck;
-    int i, p1_len;
-
-    p1_len = (split > 0 && split < n) ? split : (rand() % n);
-
-    for (i = 1; i < p1_len; i++) {
-        pile2 = pile2->nextCard;
-    }
-    Card *temp = pile2->nextCard;
-    pile2->nextCard = NULL;
-    pile2 = temp;
-
-    Card *shuffled = NULL;
-    Card *current = NULL;
-    while (pile1 != NULL && pile2 != NULL) {
-        if (rand() % 2 == 0) {
-            if (shuffled == NULL) {
-                shuffled = pile1;
-                current = shuffled;
-            } else {
-                current->nextCard = pile1;
-                current = current->nextCard;
-            }
-            pile1 = pile1->nextCard;
-        } else {
-            if (shuffled == NULL) {
-                shuffled = pile2;
-                current = shuffled;
-            } else {
-                current->nextCard = pile2;
-                current = current->nextCard;
-            }
-            pile2 = pile2->nextCard;
-        }
-    }
-    if (pile1 != NULL) {
-        current->nextCard = pile1;
-    } else {
-        current->nextCard = pile2;
-    }
-    Deck = shuffled;
-}
-
