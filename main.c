@@ -248,6 +248,8 @@ char* doCommand(char *command, char* parameter) {
 
             }
 
+            else if(strlen(command)== 2 && strlen(parameter) == 2){}
+
             else {
                 strcpy(messenge, "unknown command");
             }
@@ -471,6 +473,7 @@ void shuffleList(Card* head) {
             current = current->nextCardDec;
         }
         //generates a random integer between 0 and length
+        srand ( time(NULL) );
         rand_index = rand() % (length + 1);
 
         // Insert the removed card at the rand_index position in the shuffled list
