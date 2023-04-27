@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-
-
+#include <ctype.h>
+#include <time.h>
 
 enum Suit{H,C,D,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
@@ -181,7 +181,7 @@ char* doCommand(char *command, char* parameter) {
         } else if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
-                Deck = LD("/Users/andersjefsen/CLionProjects/YukonGameG6/deckofcards.txt");
+                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
 
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
@@ -190,45 +190,33 @@ char* doCommand(char *command, char* parameter) {
 
             }
 
-        } else if (strcmp(command, "split") == 0) {
+        } else if (strcmp(command, "SL") == 0) {
+
+            if (Deck == NULL)
+            {strcpy(messenge, "no deck");}
+
             if (parameter == NULL) {
-                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
-                split(deck, numCards(deck), 26);
+                srand ( time(NULL) );
+                split(Deck, numCards(Deck), rand() % getlength(Deck));
 
-
-                strcpy(messenge, "Loaded and split new deck");
             } else {
+                int splitvalid = true;
+                for (int i = 0; parameter[i] != '\0'; i++) {
+                    if (!isdigit(parameter[i])) {
+                        splitvalid = false;
+                    }
+                }
+                if (splitvalid) {
 
-                split(Deck, numCards(Deck), 26);
-
-                sprintf(messenge, "Split current deck", parameter);
-
+                    split(Deck, numCards(Deck),  atoi(parameter));
+                } else { strcpy(messenge, "SL takes int as parameter"); }
             }
+
         } else if (strcmp(command, "SD") == 0) {
             saveList(Deck, parameter);
 
 
-        } else if (strcmp(command, "SL") == 0) {
-            if (Deck == NULL) {
-                // Empty deck, nothing to split
-                strcpy(messenge, "No deck");
-                return NULL;
-            }
-            if (parameter == NULL) {
-                split(Deck, numCards(Deck), rand() % getlength(Deck));
-
-
-            } else {
-                char *endptr;
-                long int value = strtol(parameter, &endptr, 10);
-
-                // check for errors during conversion
-                if (*endptr != '\0') {
-                    printf("Invalid parameter: %s\n", parameter);
-                }
-            }
-
-        } else if (strcmp(command, "SR") == 0) {
+        }  else if (strcmp(command, "SR") == 0) {
             shuffleList(Deck);
             strcpy(messenge, "shuffled cards");
         } else if (strcmp(command, "SW") == 0) {
@@ -237,19 +225,22 @@ char* doCommand(char *command, char* parameter) {
             strcpy(messenge, "Here is the deck");
         } else if (strcmp(command, "P") == 0) {
             strcpy(messenge, "Game is in playphase");
+
+
             playmode = true;
         } else {
-            strcpy(messenge, "unknown command");
-        }
-    } else {
-        if (strcmp(command, "Q") == 0) {
-            strcpy(messenge, "Game is in startup phase");
-            playmode = false;
+            if (strcmp(command, "Q") == 0) {
+                strcpy(messenge, "Game is in startup phase");
+                playmode = false;
 
+            } else {
+                strcpy(messenge, "unknown command");
+            }
         }
+
     }
-}
 
+}
 void printFrow(int row)
 {
 
@@ -577,6 +568,7 @@ void split(Card *deck, int n, int split) {
         current->nextCardDec = pile2;
     }
     Deck = shuffled;
+    sprintf(messenge, "shuffled deck using split method, with parameter %d", p1_len);
 }
 
 void SW(Card* head) {
