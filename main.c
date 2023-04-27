@@ -193,7 +193,8 @@ char* doCommand(char *command, char* parameter) {
         } else if (strcmp(command, "SL") == 0) {
 
             if (Deck == NULL)
-            {strcpy(messenge, "no deck");}
+            {strcpy(messenge, "No deck");
+                return NULL;}
 
             if (parameter == NULL) {
                 srand ( time(NULL) );
@@ -217,7 +218,10 @@ char* doCommand(char *command, char* parameter) {
 
 
         }  else if (strcmp(command, "SR") == 0) {
-            shuffleList(Deck);
+            if (Deck == NULL)
+            {strcpy(messenge, "No deck");
+                return NULL;}
+            else shuffleList(Deck);
             strcpy(messenge, "shuffled cards");
         } else if (strcmp(command, "SW") == 0) {
             SW(Deck);
