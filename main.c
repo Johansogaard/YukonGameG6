@@ -176,9 +176,8 @@ void addCards(Card *cards, bool playmode)
 char* doCommand(char *command, char* parameter) {
     if (!playmode) {
 
-        if (strcmp(command, "start") == 0) {
-            strcpy(messenge, "OK");
-        } else if (strcmp(command, "LD") == 0) {
+
+         if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
                 Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
@@ -232,17 +231,29 @@ char* doCommand(char *command, char* parameter) {
 
 
             playmode = true;
-        } else {
-            if (strcmp(command, "Q") == 0) {
+
+        }
+        else {
+            strcpy(messenge, "unknown command");
+        }}
+
+
+        else {
+            if((strcmp(command, "SR")) || (strcmp(command, "LD")) || (strcmp(command, "SD")) || (strcmp(command, "P")) || (strcmp(command, "LD")) || (strcmp(command, "QQ")))
+            {strcpy(messenge, "Command not available in the PLAY phase");}
+
+            else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
                 playmode = false;
 
-            } else {
+            }
+
+            else {
                 strcpy(messenge, "unknown command");
             }
         }
 
-    }
+
 
 }
 void printFrow(int row)
