@@ -484,47 +484,6 @@ void shuffleList(Card* head) {
     // Replace the original unshuffled list with the shuffled list
     Deck = shuffled;
 }
-/*
-void Split(Card* deck, int split) {
-
-    // Split the deck in two piles
-    Card* pile1 = deck;
-    Card* pile2 = NULL;
-    int count = 1;
-    while (count < split && pile1->nextCardDec != NULL) {
-        pile1 = pile1->nextCardDec;
-        count++;
-    }
-    pile2 = pile1->nextCardDec;
-    pile1->nextCardDec = NULL;
-
-    // Interleave the cards from the two piles into the shuffled pile
-    Card* shuffled = NULL;
-    Card* current = NULL;
-    while (pile1 != NULL && pile2 != NULL) {
-        if (shuffled == NULL) {
-            shuffled = pile1;
-            pile1 = pile1->nextCardDec;
-        } else {
-            current->nextCardDec = pile2;
-            pile2 = pile2->nextCardDec;
-            current = current->nextCardDec;
-            current->nextCardDec = pile1;
-            pile1 = pile1->nextCardDec;
-        }
-        current = current == NULL ? shuffled : current->nextCardDec;
-    }
-
-    // Add any remaining cards from the non-empty pile to the bottom of the shuffled pile
-    if (pile1 != NULL) {
-        current->nextCardDec = pile1;
-    }
-    else if (pile2 != NULL) {
-        current->nextCardDec = pile2;
-    }
-    sprintf(messenge, "Deck split with parameter %d", split);
-    deck=current;
-} */
 
 //helper function for split
 int numCards(Card* deck) {
