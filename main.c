@@ -6,13 +6,14 @@
 #include <ctype.h>
 #include <time.h>
 
-enum Suit{H,C,D,S};
-enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
+
 char messenge[100] = "";
 char input[100] = "";
 char parameter[100] = "";
 bool playmode = false;
 //the struct that symbolize a card
+enum Suit{H,C,D,S};
+enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
 typedef struct Cards {
     enum Rank rank;
     enum Suit suit;
@@ -20,33 +21,8 @@ typedef struct Cards {
     struct Cards *nextCardDec;
     struct Cards *nextCardCol;
 
-/*int isBlack(Cards card) {
-	return card.Suit == C || card.Suit == S;
-}
 
-int isRed(Cards card) {
-	return card.Suit == H || card.Suit == D;
-}
 
-int isDifferentColor(Cards higher, Cards lower) {
-	return isBlack(higher) != isBlack(lower);
-}
-
-int inSequence(Cards lower, Cards higher) {
-	return higher.Rank == lower.Rank + 1;
-}
-
-int CanBePlaced(Cards lower, Cards higher) {
-	return isDifferentColor(higher, lower) && inSequence(lower, higher);
-}
-
-int isSameSuit(card first, card second) {
-	return first.suit == second.suit;
-}
-
-int canBePlacedFoundation(card parent, card child) {
-	return isSameSuit(parent, child) && isInSequence(parent, child);
-}*/
 }Card;
 
 Card* Deck;
@@ -57,6 +33,33 @@ Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
 //define f1-f4;
 Card *f1,*f2,*f3,*f4;
 
+int isBlack(Card *card) {
+    return card->suit == C || card->suit == S;
+}
+
+int isRed(Card *card) {
+    return card->suit == H || card->suit == D;
+}
+
+int isDifferentColor(Card *higher, Card *lower) {
+    return isBlack(higher) != isBlack(lower);
+}
+
+int inSequence(Card *lower, Card *higher) {
+    return higher->rank == lower->rank + 1;
+}
+
+int canBePlaced(Card *lower, Card *higher) {
+    return isDifferentColor(higher, lower) && inSequence(lower, higher);
+}
+
+int isSameSuit(Card *first, Card *second) {
+    return first->suit == second->suit;
+}
+
+int canBePlacedFoundation(Card *parent, Card *child) {
+    return isSameSuit(parent, child) && inSequence(parent, child);
+}
 
 //decleration of methods used in the program
 Card *LD(char *filepath);
@@ -78,6 +81,8 @@ int getlength(Card* head);
 void addCards(Card *cards, bool playmode);
 char getCharSuit(int Suit);
 void SW(Card* head);
+Card* getCard(char* card);
+void gameMove(char* command, char* Parameter);
 Card *getCardAtIndexInCol(Card *head, int index);
 
 
@@ -250,9 +255,9 @@ char* doCommand(char *command, char* parameter) {
                 playmode = false;
 
             }
-else if(command==!NULL && parameter==!NULL) {
-     if (strlen(command) == 2 && strlen(parameter) == 2) {  }
-                strcpy(messenge, "unknown command");
+else if(command!=NULL && parameter!=NULL) {
+     if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
+
 }
             else {
                 strcpy(messenge, "unknown command");
@@ -540,6 +545,34 @@ void Split(Card* deck, int split) {
 } */
 
 //helper function for split
+
+void gameMove(char* Command, char* Parameter){
+    Card *from = getCard(Command);
+     Card *to=getCard(Parameter);
+    if (Command==NULL || Parameter==NULL){
+        strcpy(messenge, "CARD not found");
+    }
+    if (canBePlaced(from, to)){
+        from->nextCardDec=to;}
+    strcpy(messenge, "moved AC DC");
+}
+
+Card* getCard(char* input){
+    int desiredsuit = getValue(input[0]);
+    int desiredrank = getValue(input[1]);
+    Card* head=Deck;
+    while(head!=NULL){
+        if (head->suit==desiredsuit && head->rank==desiredrank){
+            return head;
+        }
+
+        head=head->nextCardDec;
+
+    }
+    strcpy(messenge,"card not found");
+    return NULL;
+}
+
 int numCards(Card* deck) {
     int count = 0;
     Card* current = deck;
@@ -774,3 +807,4 @@ int getlength(Card* head) {
     }
     return count;
 }
+
