@@ -10,6 +10,7 @@ enum Suit{H,C,D,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
 char messenge[100] = "";
 char input[100] = "";
+char parameter[100] = "";
 bool playmode = false;
 //the struct that symbolize a card
 typedef struct Cards {
@@ -65,7 +66,7 @@ int numCards(Card* deck);
 void printList(Card *c);
 void swapCards(Card* card1, Card* card2);
 Card *getCardAtIndexInDeck(Card *head, int index);
-void makeBoard(char *lc,char *msg);
+void makeBoard(char *lc,char *msg, char *parameter);
 void printFrow(int row);
 char* doCommand(char *command, char* parameter);
 char RankIntToChar(int rank);
@@ -83,7 +84,7 @@ Card *getCardAtIndexInCol(Card *head, int index);
 int main() {
 
 
-    makeBoard(input,messenge);
+    makeBoard(input,messenge, parameter);
     while (true)
     {
 
@@ -95,10 +96,11 @@ int main() {
         // tokenize the input string to extract the command and parameter
         char *command = strtok(input, " ");
         char *parameter = strtok(NULL, " ");
-
+        if(!playmode){
         if (strcmp(command, "QQ") == 0) {
             printf("\ngame shutting down\n");
             break;
+        }
         }
         //does the commandLD
         //printf("%s",parameter);
@@ -111,7 +113,8 @@ int main() {
                 addCards(Deck, false);
             }
         }
-        makeBoard(command, messenge);
+
+        makeBoard(command, messenge, parameter);
 
         /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
     }
@@ -176,9 +179,8 @@ void addCards(Card *cards, bool playmode)
 char* doCommand(char *command, char* parameter) {
     if (!playmode) {
 
-        if (strcmp(command, "start") == 0) {
-            strcpy(messenge, "OK");
-        } else if (strcmp(command, "LD") == 0) {
+
+         if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
                 Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
@@ -205,7 +207,8 @@ char* doCommand(char *command, char* parameter) {
         } else if (strcmp(command, "SL") == 0) {
 
             if (Deck == NULL)
-            {strcpy(messenge, "no deck");}
+            {strcpy(messenge, "No deck");
+                return NULL;}
 
             if (parameter == NULL) {
                 srand ( time(NULL) );
@@ -229,7 +232,10 @@ char* doCommand(char *command, char* parameter) {
 
 
         }  else if (strcmp(command, "SR") == 0) {
-            shuffleList(Deck);
+            if (Deck == NULL)
+            {strcpy(messenge, "No deck");
+                return NULL;}
+            else shuffleList(Deck);
             strcpy(messenge, "shuffled cards");
         } else if (strcmp(command, "SW") == 0) {
             SW(Deck);
@@ -240,17 +246,32 @@ char* doCommand(char *command, char* parameter) {
 
 
             playmode = true;
-        } else {
-            if (strcmp(command, "Q") == 0) {
+
+        }
+        else {
+            strcpy(messenge, "unknown command");
+        }}
+
+
+        else {
+            if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "QQ"))==0)
+            {strcpy(messenge, "Command not available in the PLAY phase");}
+
+            else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
                 playmode = false;
 
-            } else {
+            }
+else if(command==!NULL && parameter==!NULL) {
+     if (strlen(command) == 2 && strlen(parameter) == 2) {  }
+                strcpy(messenge, "unknown command");
+}
+            else {
                 strcpy(messenge, "unknown command");
             }
         }
 
-    }
+
 
 }
 void printFrow(int row)
@@ -309,7 +330,7 @@ bool printCCard(Card *c,int row,bool isEmpty) {
         return isEmpty;
     }
 }
-void makeBoard(char *lc,char *msg)
+void makeBoard(char *lc,char *msg, char *parameter)
 {
     printf("C1\tC2\tC3\tC4\tC5\tC6\tC7\n\n");
 
@@ -330,7 +351,10 @@ void makeBoard(char *lc,char *msg)
        printf("\n");
        row++;
      }
-    printf("LAST Command:%s",lc);
+    if(playmode && parameter!=NULL){
+    printf("LAST Command:%s %s",lc, parameter);}
+    else {printf("LAST Command:%s ",lc);}
+
     printf("\nMessage: %s\n",msg);
     printf("INPUT >");
 
@@ -468,6 +492,7 @@ void shuffleList(Card* head) {
             current = current->nextCardDec;
         }
         //generates a random integer between 0 and length
+        srand ( time(NULL) );
         rand_index = rand() % (length + 1);
 
         // Insert the removed card at the rand_index position in the shuffled list
