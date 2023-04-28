@@ -145,32 +145,82 @@ void addCards(Card *cards, bool playmode)
     int row = 0;
     int i = 0;
     Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
+    bool setcard[] = {false,true,true,true,true,true,true};
 
     if (playmode) {
-        int numCards[] = {1, 6, 7, 8, 9, 10, 11};
-        for (int j = 6; j >= 0; j--) {
-            for (int k = 0; k < numCards[j]; k++) {
-                c[j] = cards;
+        for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
+            c[j] = cards;
+            getCardAtIndexInCol(c[i], row)->nextCardCol = NULL;
+            if(j>0)
+            {
+                c[j]->hidden=true;
+
+            } else
+            {
+                c[j]->hidden=false;
+            }
+            cards = cards->nextCardDec;
+        }
+        while (cards != NULL) {
+            int sethid =1;
+            sethid = sethid+row;
+            if(i>sethid)
+            {
+                cards->hidden=true;
+            } else
+            {
+                cards->hidden=false;
+            }
+            if(setcard[i] ==true) {
+                getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
                 cards = cards->nextCardDec;
+                getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
+            }
+            i = (i + 1) % 7;
+            if (i == 0) {
+                row++;
+            }
+            switch (row) {
+                case 5:
+                    setcard[1] = false;
+                    break;
+                case 6:
+                    setcard[2] = false;
+                    break;
+                case 7:
+                    setcard[3] = false;
+                    break;
+                case 8:
+                    setcard[4]=false;
+                    break;
+                case 9:
+                    setcard[5] = false;
+                    break;
+                default:
+                    break;
+                
             }
         }
-    } else {
+        }
+    else {
         for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
             c[j] = cards;
             cards = cards->nextCardDec;
         }
-    }
 
-    while (cards != NULL) {
-        getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
-        cards = cards->nextCardDec;
-        getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
-        i = (i + 1) % 7;
-        if (i == 0) {
-            row++;
+
+        while (cards != NULL) {
+            getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
+            cards = cards->nextCardDec;
+            getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
+            i = (i + 1) % 7;
+            if (i == 0) {
+                row++;
+            }
         }
-    }
 
+
+    }
     c1 = c[0];
     c2 = c[1];
     c3 = c[2];
@@ -188,12 +238,24 @@ char* doCommand(char *command, char* parameter) {
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
-                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+                Deck = LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
 
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
 
                 Deck = LD(parameter);
+
+            }
+
+        } else if (strcmp(command, "split") == 0) {
+            if (parameter == NULL) {
+                strcpy(messenge, "split loaded deck");
+                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
+                split(deck, numCards(deck), 26);
+
+            } else {
+                sprintf(messenge, "split current deck", parameter);
+                split(Deck, numCards(Deck), 26);
 
             }
 
@@ -502,47 +564,6 @@ void shuffleList(Card* head) {
     // Replace the original unshuffled list with the shuffled list
     Deck = shuffled;
 }
-/*
-void Split(Card* deck, int split) {
-
-    // Split the deck in two piles
-    Card* pile1 = deck;
-    Card* pile2 = NULL;
-    int count = 1;
-    while (count < split && pile1->nextCardDec != NULL) {
-        pile1 = pile1->nextCardDec;
-        count++;
-    }
-    pile2 = pile1->nextCardDec;
-    pile1->nextCardDec = NULL;
-
-    // Interleave the cards from the two piles into the shuffled pile
-    Card* shuffled = NULL;
-    Card* current = NULL;
-    while (pile1 != NULL && pile2 != NULL) {
-        if (shuffled == NULL) {
-            shuffled = pile1;
-            pile1 = pile1->nextCardDec;
-        } else {
-            current->nextCardDec = pile2;
-            pile2 = pile2->nextCardDec;
-            current = current->nextCardDec;
-            current->nextCardDec = pile1;
-            pile1 = pile1->nextCardDec;
-        }
-        current = current == NULL ? shuffled : current->nextCardDec;
-    }
-
-    // Add any remaining cards from the non-empty pile to the bottom of the shuffled pile
-    if (pile1 != NULL) {
-        current->nextCardDec = pile1;
-    }
-    else if (pile2 != NULL) {
-        current->nextCardDec = pile2;
-    }
-    sprintf(messenge, "Deck split with parameter %d", split);
-    deck=current;
-} */
 
 //helper function for split
 
