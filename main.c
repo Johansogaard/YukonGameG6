@@ -190,6 +190,18 @@ char* doCommand(char *command, char* parameter) {
 
             }
 
+        } else if (strcmp(command, "split") == 0) {
+            if (parameter == NULL) {
+                strcpy(messenge, "split loaded deck");
+                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
+                split(deck, numCards(deck), 26);
+
+            } else {
+                sprintf(messenge, "split current deck", parameter);
+                split(Deck, numCards(Deck), 26);
+
+            }
+
         } else if (strcmp(command, "SL") == 0) {
 
             if (Deck == NULL)
