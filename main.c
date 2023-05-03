@@ -11,8 +11,9 @@ char messenge[100] = "";
 char input[100] = "";
 char parameter[100] = "";
 bool playmode = false;
+
 //the struct that symbolize a card
-enum Suit{H,C,D,S};
+enum Suit{C,D,H,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
 typedef struct Cards {
     enum Rank rank;
@@ -21,17 +22,15 @@ typedef struct Cards {
     struct Cards *nextCardDec;
     struct Cards *nextCardCol;
 
-
-
 }Card;
 
 Card* Deck;
 
-
+Card* to;
 //define c1-c7
 Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
 //define f1-f4;
-Card *f1,*f2,*f3,*f4;
+Card *f1, *f2, *f3, *f4;
 
 int isBlack(Card *card) {
     return card->suit == C || card->suit == S;
@@ -83,8 +82,11 @@ char getCharSuit(int Suit);
 void SW(Card* head);
 Card* getCard(char* card);
 void gameMove(char* command, char* Parameter);
+Card* youPointingAtMe(Card* me);
 Card *getCardAtIndexInCol(Card *head, int index);
-
+void saveToFile(char* File);
+void loadCards(char* File);
+void foundationMove(char* Command, char* Parameter);
 
 int main() {
 
@@ -111,13 +113,11 @@ int main() {
         //printf("%s",parameter);
         doCommand(command, parameter);
         //makes a new board
-        if (Deck != NULL) {
-            if (playmode) {
-                addCards(Deck, true);
-            } else {
-                addCards(Deck, false);
-            }
+
+        if (Deck != NULL && !playmode){
+            addCards(Deck, playmode);
         }
+
 
         makeBoard(command, messenge, parameter);
 
@@ -238,13 +238,13 @@ char* doCommand(char *command, char* parameter) {
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
-                Deck = LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
-
+                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+                addCards(Deck, playmode);
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
 
                 Deck = LD(parameter);
-
+                                   addCards(Deck, playmode);
             }
 
         } else if (strcmp(command, "split") == 0) {
@@ -287,38 +287,47 @@ char* doCommand(char *command, char* parameter) {
 
 
         }  else if (strcmp(command, "SR") == 0) {
+
             if (Deck == NULL)
             {strcpy(messenge, "No deck");
                 return NULL;}
+
             else shuffleList(Deck);
-            strcpy(messenge, "shuffled cards");
-        } else if (strcmp(command, "SW") == 0) {
+            strcpy(messenge, "shuffled cards");}
+
+
+         else if (strcmp(command, "SW") == 0) {
             SW(Deck);
+            strcpy(messenge, "Here is the deck");}
 
-            strcpy(messenge, "Here is the deck");
-        } else if (strcmp(command, "P") == 0) {
+         else if (strcmp(command, "P") == 0) {
             strcpy(messenge, "Game is in playphase");
-
-
             playmode = true;
-
+            addCards(Deck, playmode);
         }
-        else {
-            strcpy(messenge, "unknown command");
-        }}
 
+        else {strcpy(messenge, "unknown command");
+        }
+    }
 
-        else {
-            if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "QQ"))==0)
+        else {if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "QQ"))==0)
             {strcpy(messenge, "Command not available in the PLAY phase");}
 
             else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
-                playmode = false;
+                playmode = false;}
 
-            }
+            else if (strcmp(command, "S") == 0){
+                sprintf(messenge, "saved game to %s", parameter);
+                saveToFile(parameter);}
+
+            else if (strcmp(command, "L") == 0){
+                sprintf(messenge, "loaded game from %s", parameter);
+                loadCards(parameter);}
+
 else if(command!=NULL && parameter!=NULL) {
-     if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
+    if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
+     else if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
 
 }
             else {
@@ -497,6 +506,74 @@ char getCharSuit(int Suit) {
     }
     return suit;
 }
+
+void saveToFile(char* File) {
+    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
+
+    Card *head = Deck;
+    FILE *fp = fopen(File, "wb");
+    if (fp == NULL) {
+        strcpy(messenge,"Error opening file");
+        return;
+    }
+    for (int i = 0; i < 7; i++) {
+        // Write the column identifier to the file
+        fwrite(&i, sizeof(int), 1, fp);
+
+        // Traverse the linked list for this column
+        Card *current = c[i];
+        while (current != NULL) {
+            // Write the Card struct to the file
+            fwrite(current, sizeof(Card), 1, fp);
+
+            // Move to the next Card in the linked list
+            current = current->nextCardCol;
+        }
+    }
+
+    fclose(fp);
+}
+
+void loadCards(char* file) {
+    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
+
+    FILE *fp = fopen(file, "rb");
+    if (fp == NULL) {
+        printf("Error opening file\n");
+        return;
+    }
+
+    // Loop over the file
+    while (!feof(fp)) {
+        // Read the column identifier from the file
+        int columnId;
+        fread(&columnId, sizeof(int), 1, fp);
+
+        // Read the Card struct from the file
+        Card *newCard = (Card *) malloc(sizeof(Card));
+        if (!newCard) {
+            printf("Memory allocation failed\n");
+            return;
+        }
+        fread(newCard, sizeof(Card), 1, fp);
+        newCard->nextCardCol = NULL;
+
+        // Add the Card struct to the linked list for this column
+        if (c[columnId] == NULL) {
+            c[columnId] = newCard;
+        } else {
+            Card *current = c[columnId];
+            while (current->nextCardCol != NULL) {
+                current = current->nextCardCol;
+            }
+            current->nextCardCol = newCard;
+        }
+    }
+
+    fclose(fp);
+}
+
+
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
     if (head==NULL){
@@ -565,22 +642,79 @@ void shuffleList(Card* head) {
     Deck = shuffled;
 }
 
+
+
 //helper function for split
+void foundationMove(char* Command, char* Parameter) {
+    Card* from = getCard(Command);
+    Card *foundation = NULL;
+
+    switch (Parameter[1]) {
+        case '1':
+            foundation = f1;
+            break;
+        case '2':
+            foundation = f2;
+            break;
+        case '3':
+            foundation = f3;
+            break;
+        case '4':
+            foundation = f4;
+            break;
+        default:
+            foundation = NULL;
+    }
+
+    if (foundation == NULL) {
+        // Handle case where foundation is not found
+        if (strcmp(Command, "AC") == 0 || strcmp(Command, "AD") == 0 ||
+            strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) {
+        if(youPointingAtMe(from)!=NULL){
+            if (youPointingAtMe(from)->hidden == true) {
+                youPointingAtMe(from)->hidden = false;
+
+            }
+
+            youPointingAtMe(from)->nextCardCol = NULL;}
+            f1 = from;
+            sprintf(messenge, "moved %s to %s", Command, Parameter);
+        }
+    } else if (from == NULL) {
+        // Handle case where card is not found
+        strcpy(messenge, "CARD not found");
+    } else if (canBePlacedFoundation(from, foundation)) {
+        // Move the card to the foundation pile
+        youPointingAtMe(from)->nextCardCol = foundation;
+        foundation = from;
+        if (youPointingAtMe(from)->hidden == true) {
+            youPointingAtMe(from)->hidden = false;
+        }
+        sprintf(messenge, "moved %s to %s", Command, Parameter);
+    } else {
+        sprintf(messenge, "couldnt move %s to %s", Command, Parameter);
+    }
+}
+
 
 void gameMove(char* Command, char* Parameter){
     Card *from = getCard(Command);
-     Card *to=getCard(Parameter);
-    if (Command==NULL || Parameter==NULL){
+     to=getCard(Parameter);
+    if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
     }
     if (canBePlaced(from, to)){
-        from->nextCardDec=to;}
-    strcpy(messenge, "moved AC DC");
+        if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
+        youPointingAtMe(from)->nextCardCol=NULL;
+        to->nextCardCol=from;
+        sprintf(messenge, "moved %s to %s", Command, Parameter);
+        }
+
 }
 
 Card* getCard(char* input){
-    int desiredsuit = getValue(input[0]);
-    int desiredrank = getValue(input[1]);
+    enum Suit desiredsuit = getValue(input[1]);
+    enum Rank desiredrank = getValue(input[0]);
     Card* head=Deck;
     while(head!=NULL){
         if (head->suit==desiredsuit && head->rank==desiredrank){
@@ -593,6 +727,42 @@ Card* getCard(char* input){
     strcpy(messenge,"card not found");
     return NULL;
 }
+
+Card* youPointingAtMe(Card* me){
+    Card* head=Deck;
+    while(head!=NULL) {
+        if (head->nextCardCol == me) {
+            return head;
+        }
+        head = head->nextCardDec;
+    }
+    switch (me) {
+        case c1:
+            return c1;
+        case c2:
+            return c2;
+        case c3:
+            return c3;
+        case c4:
+            return c4;
+        case c5:
+            return c5;
+        case c6:
+            return c6;
+        case c7:
+            return c7;
+        case f1:
+            return f1;
+        case f2:
+            return f2;
+        case f3:
+            return f3;
+        case f4:
+            return f4;
+    }
+}
+
+
 
 int numCards(Card* deck) {
     int count = 0;
