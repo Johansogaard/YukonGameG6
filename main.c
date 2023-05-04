@@ -6,12 +6,10 @@
 #include <ctype.h>
 #include <time.h>
 
-
 char messenge[100] = "";
 char input[100] = "";
 char parameter[100] = "";
 bool playmode = false;
-
 //the struct that symbolize a card
 enum Suit{C,D,H,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
@@ -22,11 +20,12 @@ typedef struct Cards {
     struct Cards *nextCardDec;
     struct Cards *nextCardCol;
 
+
 }Card;
 
 Card* Deck;
 
-Card* to;
+
 //define c1-c7
 Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
 //define f1-f4;
@@ -120,7 +119,6 @@ int main() {
         if (Deck != NULL && !playmode){
             addCards(Deck, playmode);
         }
-
 
         makeBoard(command, messenge, parameter);
 
@@ -742,6 +740,7 @@ void foundationMove(char* Command, char* Parameter) {
 
 void gameMove(char* Command, char* Parameter){
     Card *from = getCard(Command);
+    Card *to;
      to=getCard(Parameter);
     if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
@@ -1024,4 +1023,3 @@ int getlength(Card* head) {
     }
     return count;
 }
-
