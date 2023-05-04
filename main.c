@@ -57,7 +57,7 @@ int isSameSuit(Card *first, Card *second) {
 }
 
 int canBePlacedFoundation(Card *parent, Card *child) {
-    return isSameSuit(parent, child) && inSequence(parent, child);
+    return isSameSuit(parent, child) && inSequence(child, parent);
 }
 
 //decleration of methods used in the program
@@ -87,6 +87,9 @@ Card *getCardAtIndexInCol(Card *head, int index);
 void saveToFile(char* File);
 void loadCards(char* File);
 void foundationMove(char* Command, char* Parameter);
+bool colPointingToMe(Card* Me);
+
+
 
 int main() {
 
@@ -345,29 +348,29 @@ void printFrow(int row)
     switch (row) {
         case 0:
             if (f1 != NULL) {
-                toPrint[0] = f1->rank;
-                toPrint[1] = f1->suit + 'H';
+                toPrint[0] = RankIntToChar(f1->rank);
+                toPrint[1] = SuitIntToChar(f1->suit);
             }
             printf("%8s   F1", toPrint);
             break;
         case 1:
             if (f2!= NULL) {
-                toPrint[0] =f2->rank;
-                toPrint[1] =f2->suit + 'H';
+                toPrint[0] = RankIntToChar(f2->rank);
+                toPrint[1] = SuitIntToChar(f2->suit);
             }
             printf("%8s   F2", toPrint);
             break;
         case 2:
             if (f3 != NULL) {
-                toPrint[0] = f3->rank;
-                toPrint[1] =f3->suit + 'H';
+                toPrint[0] = RankIntToChar(f3->rank);
+                toPrint[1] = SuitIntToChar(f3->suit);
             }
             printf("%8s   F3", toPrint);
             break;
         case 3:
             if (f4 != NULL) {
-                toPrint[0] = f4->rank;
-                toPrint[1] = f4->suit + 'H';
+                toPrint[0] = RankIntToChar(f4->rank);
+                toPrint[1] = SuitIntToChar(f4->suit);
             }
             printf("%8s   F4", toPrint);
             break;
@@ -642,51 +645,91 @@ void shuffleList(Card* head) {
     Deck = shuffled;
 }
 
-
+bool colPointingToMe(Card* Me){
+    if (c1 != NULL && c1 == Me) {
+        c1 = NULL; // Make c1 a null pointer
+        return true;
+    }
+    if (c2 != NULL && c2 == Me) {
+        c2 = NULL; // Make c2 a null pointer
+        return true;
+    }
+    if (c3 != NULL && c3 == Me) {
+        c3 = NULL; // Make c3 a null pointer
+        return true;
+    }
+    if (c4 != NULL && c4 == Me) {
+        c4 = NULL; // Make c4 a null pointer
+        return true;
+    }
+    if (c5 != NULL && c5 == Me) {
+        c5 = NULL; // Make c5 a null pointer
+        return true;
+    }
+    if (c6 != NULL && c6 == Me) {
+        c6 = NULL; // Make c6 a null pointer
+        return true;
+    }
+    if (c7 != NULL && c7 == Me) {
+        c7 = NULL; // Make c7 a null pointer
+        return true;
+    }
+    // none of the pointers point to Me
+    return false;
+}
 
 //helper function for split
 void foundationMove(char* Command, char* Parameter) {
     Card* from = getCard(Command);
-    Card *foundation = NULL;
+    Card **foundation = NULL;
 
     switch (Parameter[1]) {
         case '1':
-            foundation = f1;
+            foundation = &f1;
             break;
         case '2':
-            foundation = f2;
+            foundation = &f2;
             break;
         case '3':
-            foundation = f3;
+            foundation = &f3;
             break;
         case '4':
-            foundation = f4;
+            foundation = &f4;
             break;
         default:
             foundation = NULL;
     }
 
-    if (foundation == NULL) {
+
+
+    if (*foundation == NULL) {
         // Handle case where foundation is not found
-        if (strcmp(Command, "AC") == 0 || strcmp(Command, "AD") == 0 ||
-            strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) {
-        if(youPointingAtMe(from)!=NULL){
+        if ((strcmp(Command, "AC") == 0 || strcmp(Command, "AD") == 0 ||
+            strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) && (from->nextCardCol==NULL))  {
+            if(colPointingToMe(from)){
+                *foundation = from;
+                sprintf(messenge, "moved %s to %s", Command, Parameter);}
+
+
+
+        else if(youPointingAtMe(from)!=NULL){
             if (youPointingAtMe(from)->hidden == true) {
                 youPointingAtMe(from)->hidden = false;
 
             }
 
             youPointingAtMe(from)->nextCardCol = NULL;}
-            f1 = from;
+            *foundation = from;
             sprintf(messenge, "moved %s to %s", Command, Parameter);
         }
     } else if (from == NULL) {
         // Handle case where card is not found
         strcpy(messenge, "CARD not found");
-    } else if (canBePlacedFoundation(from, foundation)) {
+    } else if (canBePlacedFoundation(from, *foundation)&& (from->nextCardCol==NULL)) {
         // Move the card to the foundation pile
         youPointingAtMe(from)->nextCardCol = foundation;
-        foundation = from;
+        *foundation = from;
+        colPointingToMe(from);
         if (youPointingAtMe(from)->hidden == true) {
             youPointingAtMe(from)->hidden = false;
         }
@@ -703,9 +746,14 @@ void gameMove(char* Command, char* Parameter){
     if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
     }
-    if (canBePlaced(from, to)){
+    if (canBePlaced(from, to) && to->nextCardCol==NULL){
+
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
         youPointingAtMe(from)->nextCardCol=NULL;
+        to->nextCardCol=from;
+        sprintf(messenge, "moved %s to %s", Command, Parameter);
+        }
+        else if(colPointingToMe(from)){
         to->nextCardCol=from;
         sprintf(messenge, "moved %s to %s", Command, Parameter);
         }
@@ -736,30 +784,8 @@ Card* youPointingAtMe(Card* me){
         }
         head = head->nextCardDec;
     }
-    switch (me) {
-        case c1:
-            return c1;
-        case c2:
-            return c2;
-        case c3:
-            return c3;
-        case c4:
-            return c4;
-        case c5:
-            return c5;
-        case c6:
-            return c6;
-        case c7:
-            return c7;
-        case f1:
-            return f1;
-        case f2:
-            return f2;
-        case f3:
-            return f3;
-        case f4:
-            return f4;
-    }
+
+
 }
 
 
