@@ -91,10 +91,9 @@ void loadCards(char* File);
 void foundationMove(char* Command, char* Parameter);
 bool colPointingToMe(Card* Me);
 void hide(Card* head);
-
+const char *SuitIntToCharTermial(int suit);
 
 int main() {
-
 
     makeBoard(input,messenge, parameter);
     while (true)
@@ -394,7 +393,7 @@ bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndexInCol(c,row)!=NULL)
     {
         if(getCardAtIndexInCol(c,row)->hidden==false) {
-            printf("%c%c\t", RankIntToChar(getCardAtIndexInCol(c, row)->rank), SuitIntToChar(getCardAtIndexInCol(c, row)->suit));
+            printf("%c%s\t", RankIntToChar(getCardAtIndexInCol(c, row)->rank), SuitIntToCharTermial(getCardAtIndexInCol(c, row)->suit));
             return false;
         } else
         {
@@ -988,6 +987,21 @@ char SuitIntToChar(int suit) {
             return 'S';
         default:
             return 'Error converting suit';  // return an error message if the integer is not recognized
+    }
+}
+
+const char *SuitIntToCharTermial(int suit) {
+    switch (suit) {
+        case C:
+            return "\u2663";
+        case D:
+            return "\u2666";
+        case H:
+            return "\u2665";
+        case S:
+            return "\u2660";
+        default:
+            return "Error converting suit";  // return an error message if the integer is not recognized
     }
 }
 
