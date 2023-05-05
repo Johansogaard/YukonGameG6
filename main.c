@@ -250,7 +250,7 @@ char* doCommand(char *command, char* parameter) {
 
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
-                strcpy(messenge, "loaded normal deck");
+                strcpy(messenge, "OK");
                 Deck = LD("/deckofcards.txt");
                 addCards(Deck, playmode);
             } else {
