@@ -248,7 +248,7 @@ char* doCommand(char *command, char* parameter) {
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
-                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+                Deck = LD("C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt");
                 addCards(Deck, playmode);
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
@@ -464,15 +464,16 @@ Card* LD(char* filepath)
 
         if(head==NULL)
         {
+            i++;
             head = malloc(sizeof(Card));
-            head->suit = getSuit(singleLine[2]);
+              head->suit = getSuit(singleLine[2]);
             head->hidden=true;
             head->rank = getRank(singleLine[0]);
             cardBefore = head;
         }
         else
         {
-
+            i++;
             Card* newCard =malloc(sizeof( Card));
             newCard->hidden=true;
             cardBefore->nextCardDec=newCard;
@@ -482,9 +483,15 @@ Card* LD(char* filepath)
         }
 
     }
+    if(i!=52)
+    {
+        sprintf(messenge, "File contains more or less than 52 cards and cannot be used", filepath);
+        return NULL;
+    } else {
 
-      cardBefore->nextCardDec=NULL;
-    return head;
+        cardBefore->nextCardDec = NULL;
+        return head;
+    }
 
 }
 char getCharSuit(int Suit) {
