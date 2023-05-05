@@ -18,6 +18,7 @@ typedef struct Cards {
     enum Rank rank;
     enum Suit suit;
     bool hidden;
+    bool inFoundation;
     struct Cards *nextCardDec;
     struct Cards *nextCardCol;
 
@@ -314,7 +315,9 @@ char* doCommand(char *command, char* parameter) {
         }
     }
 
-        else {if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0 || (strcmp(command, "QQ"))==0)
+        else {if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0
+        || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0
+        || (strcmp(command, "QQ"))==0 ||(strcmp(command, "SW"))==0)
             {strcpy(messenge, "Command not available in the PLAY phase");}
 
             else if (strcmp(command, "Q") == 0) {
@@ -701,7 +704,17 @@ void foundationMove(char* Command, char* Parameter) {
             foundation = NULL;
     }
 
-    if (foundation == NULL) {strcpy(messenge, "foundation not found");
+     if (from == NULL) {
+        // Handle case where card is not found
+        strcpy(messenge, "CARD not found");
+     return;}
+
+    if (from->inFoundation==true){
+        strcpy(messenge, "Card already in foundation");
+        return;}
+
+    if (foundation == NULL) {
+        strcpy(messenge, "foundation not found");
     return;}
 
     if (*foundation == NULL) {
@@ -710,13 +723,15 @@ void foundationMove(char* Command, char* Parameter) {
             strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) && (from->nextCardCol==NULL))  {
 
             if(colPointingToMe(from)){
-                *foundation = from;}
+                *foundation = from;
+                from->inFoundation=true;}
 
             else if(youPointingAtMe(from)!=NULL){
                 if (youPointingAtMe(from)->hidden == true) {
                 youPointingAtMe(from)->hidden = false;}
             youPointingAtMe(from)->nextCardCol = NULL;}
             *foundation = from;
+            from->inFoundation=true;
             sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
         else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
@@ -729,6 +744,7 @@ void foundationMove(char* Command, char* Parameter) {
         // Move the card to the foundation pile
         youPointingAtMe(from)->nextCardCol = foundation;
         *foundation = from;
+        from->inFoundation=true;
         colPointingToMe(from);
         if (youPointingAtMe(from)->hidden == true) {
             youPointingAtMe(from)->hidden = false;
