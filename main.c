@@ -10,6 +10,7 @@ char messenge[100] = "";
 char input[100] = "";
 char parameter[100] = "";
 bool playmode = false;
+int show=0;
 //the struct that symbolize a card
 enum Suit{C,D,H,S};
 enum Rank { A, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, J, Q, K };
@@ -87,7 +88,7 @@ void saveToFile(char* File);
 void loadCards(char* File);
 void foundationMove(char* Command, char* Parameter);
 bool colPointingToMe(Card* Me);
-
+void hide(Card* head);
 
 
 int main() {
@@ -113,12 +114,20 @@ int main() {
         }
         //does the commandLD
         //printf("%s",parameter);
-        doCommand(command, parameter);
+        if(Deck!=NULL || strcmp(command, "LD")==0) {
+            doCommand(command, parameter);
+        }
+        else{strcpy(messenge, "No deck");}
         //makes a new board
 
         if (Deck != NULL && !playmode){
             addCards(Deck, playmode);
+            if(show>0){
+                SW(Deck);}
+            else{hide(Deck);}
+
         }
+
 
         makeBoard(command, messenge, parameter);
 
@@ -262,10 +271,6 @@ char* doCommand(char *command, char* parameter) {
 
         } else if (strcmp(command, "SL") == 0) {
 
-            if (Deck == NULL)
-            {strcpy(messenge, "No deck");
-                return NULL;}
-
             if (parameter == NULL) {
                 srand ( time(NULL) );
                 split(Deck, numCards(Deck), rand() % getlength(Deck));
@@ -287,18 +292,14 @@ char* doCommand(char *command, char* parameter) {
             saveList(Deck, parameter);
 
 
-        }  else if (strcmp(command, "SR") == 0) {
+        }  else if (strcmp(command, "SR") == 0){
 
-            if (Deck == NULL)
-            {strcpy(messenge, "No deck");
-                return NULL;}
-
-            else shuffleList(Deck);
+            shuffleList(Deck);
             strcpy(messenge, "shuffled cards");}
 
 
          else if (strcmp(command, "SW") == 0) {
-            SW(Deck);
+            show++;
             strcpy(messenge, "Here is the deck");}
 
          else if (strcmp(command, "P") == 0) {
@@ -422,7 +423,6 @@ void makeBoard(char *lc,char *msg, char *parameter)
 
     printf("\nMessage: %s\n",msg);
     printf("INPUT >");
-
 
 
 }
@@ -706,7 +706,7 @@ void foundationMove(char* Command, char* Parameter) {
             strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) && (from->nextCardCol==NULL))  {
             if(colPointingToMe(from)){
                 *foundation = from;
-                sprintf(messenge, "moved %s to %s", Command, Parameter);}
+                sprintf(messenge, "Moved %s to %s", Command, Parameter);}
 
 
 
@@ -718,7 +718,7 @@ void foundationMove(char* Command, char* Parameter) {
 
             youPointingAtMe(from)->nextCardCol = NULL;}
             *foundation = from;
-            sprintf(messenge, "moved %s to %s", Command, Parameter);
+            sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
     } else if (from == NULL) {
         // Handle case where card is not found
@@ -731,9 +731,9 @@ void foundationMove(char* Command, char* Parameter) {
         if (youPointingAtMe(from)->hidden == true) {
             youPointingAtMe(from)->hidden = false;
         }
-        sprintf(messenge, "moved %s to %s", Command, Parameter);
+        sprintf(messenge, "Moved %s to %s", Command, Parameter);
     } else {
-        sprintf(messenge, "couldnt move %s to %s", Command, Parameter);
+        sprintf(messenge, "Cannot move %s to %s", Command, Parameter);
     }
 }
 
@@ -750,12 +750,13 @@ void gameMove(char* Command, char* Parameter){
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
         youPointingAtMe(from)->nextCardCol=NULL;
         to->nextCardCol=from;
-        sprintf(messenge, "moved %s to %s", Command, Parameter);
+        sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
         else if(colPointingToMe(from)){
         to->nextCardCol=from;
-        sprintf(messenge, "moved %s to %s", Command, Parameter);
+        sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
+    else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
 
 }
 
@@ -783,7 +784,6 @@ Card* youPointingAtMe(Card* me){
         }
         head = head->nextCardDec;
     }
-
 
 }
 
@@ -850,6 +850,17 @@ void SW(Card* head) {
     Card* current = head;
     while (current != NULL) {
         current->hidden = false;
+        current = current->nextCardDec;
+    }
+    Deck=starthead;
+    show--;
+}
+
+void hide(Card* head) {
+    Card* starthead=head;
+    Card* current = head;
+    while (current != NULL) {
+        current->hidden = true;
         current = current->nextCardDec;
     }
     Deck=starthead;
