@@ -310,7 +310,8 @@ char* doCommand(char *command, char* parameter) {
 
             else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
-                playmode = false;}
+                playmode = false;
+                f1=f2=f3=f4=NULL;}
 
             else if (strcmp(command, "S") == 0){
                 sprintf(messenge, "saved game to %s", parameter);
@@ -501,6 +502,7 @@ Card* LD(char* filepath)
     return head;
 
 }
+
 Card* createCard(int rank, int suit) {
     Card* newcard = malloc(sizeof(Card));
     newcard->rank = rank;
