@@ -29,7 +29,6 @@ typedef struct Cards {
 
 Card* Deck;
 
-
 //define c1-c7
 Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
 //define f1-f4;
@@ -66,7 +65,7 @@ int canBePlacedFoundation(Card *parent, Card *child) {
 //decleration of methods used in the program
 Card *LD(char *filepath);
 enum Suit getSuit(char suit);
-int getValue(char value);
+enum Rank getRank(char value);
 int numCards(Card* deck);
 void printList(Card *c);
 void swapCards(Card* card1, Card* card2);
@@ -346,9 +345,12 @@ char* doCommand(char *command, char* parameter) {
                 loadCards(parameter);}
 
 
-else if(command!=NULL && parameter!=NULL) {
+else if(command!=NULL && parameter!=NULL && !(strcmp(command, parameter))==0) {
     if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
      else if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
+    else {
+        strcpy(messenge, "unknown command/illegal move");
+    }
 
 }
             else {
@@ -483,7 +485,7 @@ Card* LD(char* filepath)
             head = malloc(sizeof(Card));
             head->suit = getSuit(singleLine[2]);
             head->hidden=true;
-            head->rank = getValue(singleLine[0]);
+            head->rank = getRank(singleLine[0]);
             cardBefore = head;
         }
         else
@@ -493,7 +495,7 @@ Card* LD(char* filepath)
             newCard->hidden=true;
             cardBefore->nextCardDec=newCard;
             newCard->suit = getSuit(singleLine[2]);
-            newCard->rank = getValue(singleLine[0]);
+            newCard->rank = getRank(singleLine[0]);
             cardBefore = newCard;
         }
 
@@ -773,6 +775,7 @@ void gameMove(char* Command, char* Parameter){
      to=getCard(Parameter);
     if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
+        return;
     }
     if (canBePlaced(from, to) && to->nextCardCol==NULL){
 
@@ -790,16 +793,14 @@ void gameMove(char* Command, char* Parameter){
 }
 
 Card* getCard(char* input){
-    enum Suit desiredsuit = getValue(input[1]);
-    enum Rank desiredrank = getValue(input[0]);
+    enum Suit desiredsuit = getSuit(input[1]);
+    enum Rank desiredrank = getRank(input[0]);
     Card* head=Deck;
     while(head!=NULL){
         if (head->suit==desiredsuit && head->rank==desiredrank){
             return head;
         }
-
         head=head->nextCardDec;
-
     }
     strcpy(messenge,"card not found");
     return NULL;
@@ -918,7 +919,7 @@ enum Suit getSuit(char suit)
     }
     return s;
 }
-int getValue(char value)
+enum Rank getRank(char value)
 {
 
         switch (value) {
@@ -948,16 +949,7 @@ int getValue(char value)
                 return Q;
             case 'K':
                 return K;
-            case 'C':
-                return C;
-            case 'D':
-                return D;
-            case 'H':
-                return H;
-            case 'S':
-                return S;
             default:
-                printf("Error: invalid rank '%c' in input file\n", value);
                 return -1;  // return -1 if the character is not recognized
         }
 }
