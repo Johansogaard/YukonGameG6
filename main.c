@@ -4,8 +4,16 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <time.h>
-#include <limits.h>
 #include <libgen.h>
+
+
+#ifdef _WIN32
+#include <windows.h>
+#define DIR_SEPARATOR "\\"
+#else
+#include <limits.h>
+#define DIR_SEPARATOR "/"
+#endif
 
 char messenge[100] = "";
 char input[100] = "";
@@ -451,17 +459,18 @@ Card* LD(char* filepath)
     char singleLine[3];
     char* filedir = dirname(__FILE__);
     char fullpath[PATH_MAX];
-    snprintf(fullpath, PATH_MAX, "%s/%s", filedir, filepath);
+#ifdef _WIN32
+    GetFullPathName(filepath, PATH_MAX, fullpath, NULL);
+#else
+    snprintf(fullpath, PATH_MAX, "%s%s%s", filedir, DIR_SEPARATOR, filepath);
+#endif
     FILE *fPointer;
     fPointer = fopen(fullpath, "r");
-//checks if the file is found
+    //checks if the file is found
     if (fPointer == NULL) {
         sprintf(messenge, "file does not exist %s", filepath);
         return fPointer;
     }
-
-    // struct Card* cards = malloc(capacity* sizeof(struct Card));
-
 
     //reading the whole file to end
     Card* head = NULL;
