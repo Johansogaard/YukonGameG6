@@ -94,6 +94,7 @@ const char *SuitIntToCharTermial(int suit);
 void TakeOutOfFoundation(Card* head);
 bool isUnderMe(Card *from, Card *to);
 
+bool deckHasAllSuitsAndValues(Card* deck);
 
 int main() {
 
@@ -142,7 +143,7 @@ int main() {
 
 
     int num_cards;
-    char filepath[] = "/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt";
+    char filepath[] = "C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt";
     // deck = LD(filepath);
 
 
@@ -501,9 +502,14 @@ Card* LD(char* filepath)
         }
 
     }
-    if(i!=52)
+    if(i>52)
     {
-        sprintf(messenge, "File contains more or less than 52 cards and cannot be used", filepath);
+        sprintf(messenge, "File contains more than 52 cards and cannot be used", filepath);
+        return NULL;
+    }
+    else if(deckHasAllSuitsAndValues(head)==false)
+    {
+        sprintf(messenge, "File dosent contain the correct cards with the correct suit and value for a full deck of cards", filepath);
         return NULL;
     } else {
 
@@ -511,6 +517,22 @@ Card* LD(char* filepath)
         return head;
     }
 
+}
+bool deckHasAllSuitsAndValues(Card* deck) {
+    bool seen[4][13] = { false };
+    Card* curr = deck;
+    while (curr != NULL) {
+        seen[curr->suit][curr->rank] = true;
+        curr = curr->nextCardDec;
+    }
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 13; j++) {
+            if (!seen[i][j]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 Card* createCard(int rank, int suit) {
