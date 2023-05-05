@@ -61,6 +61,8 @@ int canBePlacedFoundation(Card *parent, Card *child) {
 
 //decleration of methods used in the program
 Card *LD(char *filepath);
+Card* createDeck();
+Card* createCard(int rank, int suit);
 enum Suit getSuit(char suit);
 enum Rank getRank(char value);
 int numCards(Card* deck);
@@ -248,6 +250,7 @@ char* doCommand(char *command, char* parameter) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
                 Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+                Deck = createDeck();
                 addCards(Deck, playmode);
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
@@ -256,21 +259,8 @@ char* doCommand(char *command, char* parameter) {
                 if (Deck!=NULL){addCards(Deck, playmode);     }
 
             }
-
-
-        } else if (strcmp(command, "split") == 0) {
-            if (parameter == NULL) {
-                strcpy(messenge, "split loaded deck");
-                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
-                split(deck, numCards(deck), 26);
-
-            } else {
-                sprintf(messenge, "split current deck", parameter);
-                split(Deck, numCards(Deck), 26);
-
-            }
-
-        } else if (strcmp(command, "SL") == 0) {
+        }
+         else if (strcmp(command, "SL") == 0) {
 
             if (parameter == NULL) {
                 srand ( time(NULL) );
@@ -443,6 +433,31 @@ void printList(Card* c)
         c = c->nextCardDec;
     }
 }
+Card* createDeck() {
+    Card* head = NULL;
+    Card* last = NULL;
+
+    // create a card object for each rank/suit combination and add it to the end of the linked list
+    for (int suit = C; suit <= S; suit++) {
+        for (int rank = A; rank <= K; rank++) {
+            Card* newcard = createCard(rank, suit);
+            if (newcard == NULL) {
+                printf("Error creating new card.\n");
+                return NULL;
+            }
+
+            if (head == NULL) {
+                head = newcard;
+                last = newcard;
+            } else {
+                last->nextCardDec = newcard;
+                last = newcard;
+            }
+        }
+    }
+    return head;
+    }
+
 Card* LD(char* filepath)
 {
     char singleLine[3];
@@ -486,6 +501,14 @@ Card* LD(char* filepath)
     return head;
 
 }
+Card* createCard(int rank, int suit) {
+    Card* newcard = malloc(sizeof(Card));
+    newcard->rank = rank;
+    newcard->suit = suit;
+    newcard->hidden = 0;   // initialize the hidden flag to false
+    newcard->nextCardDec = NULL;  // initialize the next pointer to NULL
+    return newcard;}
+
 char getCharSuit(int Suit) {
     char suit;
     switch (Suit) {
