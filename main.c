@@ -106,6 +106,7 @@ int main() {
         // tokenize the input string to extract the command and parameter
         char *command = strtok(input, " ");
         char *parameter = strtok(NULL, " ");
+        if(command==NULL){command=" ";}
         if(!playmode){
         if (strcmp(command, "QQ") == 0) {
             printf("\ngame shutting down\n");
@@ -254,7 +255,8 @@ char* doCommand(char *command, char* parameter) {
                 sprintf(messenge, "loaded deck from %s", parameter);
 
                 Deck = LD(parameter);
-                                   addCards(Deck, playmode);
+                if (Deck!=NULL){addCards(Deck, playmode);     }
+
             }
 
         } else if (strcmp(command, "split") == 0) {
@@ -326,6 +328,7 @@ char* doCommand(char *command, char* parameter) {
             else if (strcmp(command, "L") == 0){
                 sprintf(messenge, "loaded game from %s", parameter);
                 loadCards(parameter);}
+
 
 else if(command!=NULL && parameter!=NULL) {
     if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
@@ -698,29 +701,28 @@ void foundationMove(char* Command, char* Parameter) {
             foundation = NULL;
     }
 
-
+    if (foundation == NULL) {strcpy(messenge, "foundation not found");
+    return;}
 
     if (*foundation == NULL) {
         // Handle case where foundation is not found
         if ((strcmp(Command, "AC") == 0 || strcmp(Command, "AD") == 0 ||
             strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) && (from->nextCardCol==NULL))  {
+
             if(colPointingToMe(from)){
-                *foundation = from;
-                sprintf(messenge, "Moved %s to %s", Command, Parameter);}
+                *foundation = from;}
 
-
-
-        else if(youPointingAtMe(from)!=NULL){
-            if (youPointingAtMe(from)->hidden == true) {
-                youPointingAtMe(from)->hidden = false;
-
-            }
-
+            else if(youPointingAtMe(from)!=NULL){
+                if (youPointingAtMe(from)->hidden == true) {
+                youPointingAtMe(from)->hidden = false;}
             youPointingAtMe(from)->nextCardCol = NULL;}
             *foundation = from;
             sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
-    } else if (from == NULL) {
+        else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
+    }
+
+    else if (from == NULL) {
         // Handle case where card is not found
         strcpy(messenge, "CARD not found");
     } else if (canBePlacedFoundation(from, *foundation)&& (from->nextCardCol==NULL)) {
