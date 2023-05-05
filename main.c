@@ -4,16 +4,6 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <time.h>
-#include <libgen.h>
-
-
-#ifdef _WIN32
-#include <windows.h>
-#define DIR_SEPARATOR "\\"
-#else
-#include <limits.h>
-#define DIR_SEPARATOR "/"
-#endif
 
 char messenge[100] = "";
 char input[100] = "";
@@ -257,8 +247,8 @@ char* doCommand(char *command, char* parameter) {
 
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
-                strcpy(messenge, "OK");
-                Deck = LD("/deckofcards.txt");
+                strcpy(messenge, "loaded normal deck");
+                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
                 addCards(Deck, playmode);
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
@@ -272,7 +262,7 @@ char* doCommand(char *command, char* parameter) {
         } else if (strcmp(command, "split") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "split loaded deck");
-                Card *deck = LD("/deckofcards.txt");
+                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
                 split(deck, numCards(deck), 26);
 
             } else {
@@ -457,15 +447,9 @@ void printList(Card* c)
 Card* LD(char* filepath)
 {
     char singleLine[3];
-    char* filedir = dirname(__FILE__);
-    char fullpath[PATH_MAX];
-#ifdef _WIN32
-    GetFullPathName(filepath, PATH_MAX, fullpath, NULL);
-#else
-    snprintf(fullpath, PATH_MAX, "%s%s%s", filedir, DIR_SEPARATOR, filepath);
-#endif
+
     FILE *fPointer;
-    fPointer = fopen(fullpath, "r");
+    fPointer = fopen(filepath, "r");
     //checks if the file is found
     if (fPointer == NULL) {
         sprintf(messenge, "file does not exist %s", filepath);
