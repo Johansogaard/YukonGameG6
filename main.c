@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
+#include <sys/syslimits.h>
+#include <libgen.h>
 
 char messenge[100] = "";
 char input[100] = "";
@@ -249,7 +251,7 @@ char* doCommand(char *command, char* parameter) {
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "loaded normal deck");
-                Deck = LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt");
+                Deck = LD("/deckofcards.txt");
                 addCards(Deck, playmode);
             } else {
                 sprintf(messenge, "loaded deck from %s", parameter);
@@ -262,7 +264,7 @@ char* doCommand(char *command, char* parameter) {
         } else if (strcmp(command, "split") == 0) {
             if (parameter == NULL) {
                 strcpy(messenge, "split loaded deck");
-                Card *deck = LD("/Users/mikkel/Desktop/C-projekter/YukonGame/Projekt2/deckofcards.txt");
+                Card *deck = LD("/deckofcards.txt");
                 split(deck, numCards(deck), 26);
 
             } else {
@@ -441,20 +443,18 @@ void printList(Card* c)
 }
 Card* LD(char* filepath)
 {
-
-
     char singleLine[3];
-
+    char* filedir = dirname(__FILE__);
+    char fullpath[PATH_MAX];
+    snprintf(fullpath, PATH_MAX, "%s/%s", filedir, filepath);
     FILE *fPointer;
-    fPointer = fopen(filepath, "r");
-    //checks if the file is found
+    fPointer = fopen(fullpath, "r");
+//checks if the file is found
     if (fPointer == NULL) {
-
         sprintf(messenge, "file does not exist %s", filepath);
-
         return fPointer;
-
     }
+
     // struct Card* cards = malloc(capacity* sizeof(struct Card));
 
 
