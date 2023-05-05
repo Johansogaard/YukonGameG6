@@ -211,7 +211,7 @@ void addCards(Card *cards, bool playmode)
                     break;
                 default:
                     break;
-                
+
             }
         }
         }
@@ -254,12 +254,23 @@ char* doCommand(char *command, char* parameter) {
                 Deck = LD("/deckofcards.txt");
                 addCards(Deck, playmode);
             } else {
-                sprintf(messenge, "loaded deck from %s", parameter);
-
-                Deck = LD(parameter);
-                if (Deck!=NULL){addCards(Deck, playmode);     }
-
+                // check if parameter starts with "<" and ends with ">"
+                if (parameter[0] == '<' && parameter[strlen(parameter)-1] == '>') {
+                    // create a new string without "<" and ">"
+                    char* filename = (char*) malloc(strlen(parameter)-1);
+                    strncpy(filename, parameter+1, strlen(parameter)-2);
+                    filename[strlen(parameter)-2] = '\0';
+                    sprintf(messenge, "loaded deck from %s", filename);
+                    Deck = LD(filename);
+                    if (Deck != NULL) {
+                        addCards(Deck, playmode);
+                    }
+                    free(filename);
+                } else {
+                    strcpy(messenge, "invalid filename format. Use LD <filename.txt>");
+                }
             }
+
 
         } else if (strcmp(command, "split") == 0) {
             if (parameter == NULL) {
