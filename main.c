@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
-#include <sys/syslimits.h>
+#include <limits.h>
 #include <libgen.h>
 
 char messenge[100] = "";
@@ -490,6 +490,7 @@ Card* LD(char* filepath)
         }
 
     }
+
       cardBefore->nextCardDec=NULL;
     return head;
 
