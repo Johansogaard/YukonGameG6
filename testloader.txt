@@ -11,7 +11,7 @@ J C
 Q C
 K C
 A D
-2 D
+A C
 3 D
 4 D
 5 D
@@ -49,3 +49,4 @@ T S
 J S
 Q S
 K S
+A C

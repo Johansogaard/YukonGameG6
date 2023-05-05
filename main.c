@@ -91,6 +91,9 @@ void foundationMove(char* Command, char* Parameter);
 bool colPointingToMe(Card* Me);
 void hide(Card* head);
 const char *SuitIntToCharTermial(int suit);
+void TakeOutOfFoundation(Card* head);
+bool isUnderMe(Card *from, Card *to);
+
 
 int main() {
 
@@ -310,7 +313,8 @@ char* doCommand(char *command, char* parameter) {
             else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
                 playmode = false;
-                f1=f2=f3=f4=NULL;}
+                f1=f2=f3=f4=NULL;
+                TakeOutOfFoundation(Deck);}
 
             else if (strcmp(command, "S") == 0){
                 sprintf(messenge, "saved game to %s", parameter);
@@ -321,7 +325,7 @@ char* doCommand(char *command, char* parameter) {
                 loadCards(parameter);}
 
 
-else if(command!=NULL && parameter!=NULL && !(strcmp(command, parameter))==0) {
+else if(command!=NULL && parameter!=NULL && (!(strcmp(command, parameter)))==0) {
     if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
      else if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
     else {
@@ -467,7 +471,7 @@ Card* LD(char* filepath)
     //checks if the file is found
     if (fPointer == NULL) {
         sprintf(messenge, "file does not exist %s", filepath);
-        return fPointer;
+        return NULL;
     }
 
     //reading the whole file to end
@@ -790,7 +794,7 @@ void gameMove(char* Command, char* Parameter){
         strcpy(messenge, "CARD not found");
         return;
     }
-    if (canBePlaced(from, to) && to->nextCardCol==NULL){
+    if (canBePlaced(from, to) && to->nextCardCol==NULL && !isUnderMe(from, to)){
 
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
         youPointingAtMe(from)->nextCardCol=NULL;
@@ -829,8 +833,6 @@ Card* youPointingAtMe(Card* me){
     }
 
 }
-
-
 
 int numCards(Card* deck) {
     int count = 0;
@@ -904,6 +906,16 @@ void hide(Card* head) {
     Card* current = head;
     while (current != NULL) {
         current->hidden = true;
+        current = current->nextCardDec;
+    }
+    Deck=starthead;
+}
+
+void TakeOutOfFoundation(Card* head) {
+    Card* starthead=head;
+    Card* current = head;
+    while (current != NULL) {
+        current->inFoundation = false;
         current = current->nextCardDec;
     }
     Deck=starthead;
@@ -995,8 +1007,7 @@ char RankIntToChar(int rank) {
             return 'Q';
         case K:
             return 'K';
-        default:
-            return 'Error converting Rank';
+
     }
 }
 char SuitIntToChar(int suit) {
@@ -1009,8 +1020,18 @@ char SuitIntToChar(int suit) {
             return 'H';
         case S:
             return 'S';
-        default:
-            return 'Error converting suit';  // return an error message if the integer is not recognized
+         // return an error message if the integer is not recognized
+    }
+}
+
+bool isUnderMe(Card *from, Card *to){
+    Card *current = from;
+    while (current!=NULL){
+        if (current->nextCardCol==to){
+            return true;
+        current=current->nextCardCol;
+        }
+        return false;
     }
 }
 
@@ -1024,8 +1045,7 @@ const char *SuitIntToCharTermial(int suit) {
             return "\u2665";
         case S:
             return "\u2660";
-        default:
-            return "Error converting suit";  // return an error message if the integer is not recognized
+         // return an error message if the integer is not recognized
     }
 }
 
