@@ -101,15 +101,23 @@ int main() {
     makeBoard(input,messenge, parameter);
     while (true)
     {
-
+            char *command;
+            char *parameter;
         fgets(input, sizeof(input), stdin);
 
         // remove the newline character at the end of the input
         input[strcspn(input, "\n")] = 0;
 
         // tokenize the input string to extract the command and parameter
-        char *command = strtok(input, " ");
-        char *parameter = strtok(NULL, " ");
+        if(!playmode){
+         command = strtok(input, " ");
+        parameter = strtok(NULL, " ");}
+        else {
+            command = strtok(input, "->");
+            parameter = strtok(NULL, "");
+             }
+
+
         if(command==NULL){command=" ";}
         if(!playmode){
         if (strcmp(command, "QQ") == 0) {
@@ -252,11 +260,11 @@ char* doCommand(char *command, char* parameter) {
 
          if (strcmp(command, "LD") == 0) {
             if (parameter == NULL) {
-                strcpy(messenge, "loaded normal deck");
+                strcpy(messenge, "OK");
                 Deck = createDeck();
                 addCards(Deck, playmode);
             } else {
-                sprintf(messenge, "loaded deck from %s", parameter);
+                strcpy(messenge, "OK");
 
                 Deck = LD(parameter);
                 if (Deck!=NULL){addCards(Deck, playmode);     }
@@ -283,6 +291,7 @@ char* doCommand(char *command, char* parameter) {
             }
 
         } else if (strcmp(command, "SD") == 0) {
+             if (parameter == NULL) {saveList(Deck, "relativ filepath");}
             saveList(Deck, parameter);
 
 
@@ -294,7 +303,7 @@ char* doCommand(char *command, char* parameter) {
 
          else if (strcmp(command, "SW") == 0) {
             show++;
-            strcpy(messenge, "Here is the deck");}
+            strcpy(messenge, "OK");}
 
          else if (strcmp(command, "P") == 0) {
             strcpy(messenge, "Game is in playphase");
@@ -471,7 +480,7 @@ Card* LD(char* filepath)
     fPointer = fopen(filepath, "r");
     //checks if the file is found
     if (fPointer == NULL) {
-        sprintf(messenge, "file does not exist %s", filepath);
+        sprintf(messenge, "the file does not exist %s", filepath);
         return NULL;
     }
 
@@ -816,7 +825,7 @@ void gameMove(char* Command, char* Parameter){
         strcpy(messenge, "CARD not found");
         return;
     }
-    if (canBePlaced(from, to) && to->nextCardCol==NULL && !isUnderMe(from, to)){
+    if (canBePlaced(from, to) && to->nextCardCol==NULL){
 
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
         youPointingAtMe(from)->nextCardCol=NULL;
