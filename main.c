@@ -917,7 +917,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
     if(from==NULL){strcpy(messenge, "wrong input"); return;}
 
-    if(Parameter[0]=='F') {
+    if(Parameter[0]=='F' && from->inFoundation==false) {
 
         Card **foundation=getFoundation(Parameter);
 
@@ -927,6 +927,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
                 placeSafe(from);
             *foundation = from;
+            from->inFoundation=true;
             }
 
         else if (canBePlacedFoundation(from, to)&& (from->nextCardCol==NULL)) {
@@ -934,6 +935,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
                 placeSafe(from);
                 to->nextCardCol = from;
+                from->inFoundation=true;
             }
         }
     }
@@ -953,7 +955,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
         if(from==NULL){strcpy(messenge, "wrong input"); return;}
 
-        if(Parameter[0]=='F') {
+        if(Parameter[0]=='F'&& from->inFoundation==false) {
 
             if(!cardInCol(getCol(Subcommand), from)){
                 sprintf(messenge, "Card %s not in foundation %s", Command, Subcommand);
@@ -967,6 +969,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
                     placeSafe(from);
                     *foundation = from;
+                    from->inFoundation=true;
                 }
 
                 else if (canBePlacedFoundation(from, to)&& (from->nextCardCol==NULL)) {
@@ -974,12 +977,14 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
                     placeSafe(from);
                     to->nextCardCol = from;
+                    from->inFoundation=true;
                 }
             }
 
         else if(Parameter[0]!='F' && canBePlaced(from, to)) {
             placeSafe(from);
             to->nextCardCol = from;
+            from->inFoundation=false;
             strcpy(messenge, "ok");
 
         }}
@@ -993,6 +998,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
             if (canBePlaced(from, to)) {
                 placeSafe(from);
                 to->nextCardCol = from;
+                from->inFoundation=false;
                 strcpy(messenge, "ok");
 
             }
