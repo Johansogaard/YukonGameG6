@@ -730,8 +730,9 @@ void shuffleList(Card* head) {
 
 bool cardInCol(Card* col,Card* me){
     Card* current=col;
+
     while(current->nextCardCol!=NULL){
-        if (current==me){
+        if (current==me||current->nextCardCol==me){
             return true;
         }
         current=current->nextCardCol;
@@ -914,7 +915,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
         Card* to=cardAtEndOfCol(getCol(Parameter));
 
-
+    if(from==NULL){strcpy(messenge, "wrong input"); return;}
 
     if(Parameter[0]=='F') {
 
@@ -950,18 +951,19 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
             Card* to=cardAtEndOfCol(getCol(Parameter));
 
-        if(from==NULL ||to==NULL ||foundation==NULL){strcpy(messenge, "wrong input"); return;}
+        if(from==NULL){strcpy(messenge, "wrong input"); return;}
 
-        if(parameter[0]=='F') {
+        if(Parameter[0]=='F') {
 
             if(!cardInCol(getCol(Subcommand), from)){
                 sprintf(messenge, "Card %s not in foundation %s", Command, Subcommand);
                 return;}
 
-            if (foundation == NULL) {
+            Card **foundation=getFoundation(Parameter);
+
+            if (*foundation == NULL) {
                 // Handle case where foundation is not found
-                if ((strcmp(Subcommand, "AC") == 0 || strcmp(Subcommand, "AD") == 0 ||
-                     strcmp(Subcommand, "AH") == 0 || strcmp(Subcommand, "AS") == 0) && (from->nextCardCol==NULL))  {
+                if (from->rank==A && (from->nextCardCol==NULL))  {
 
                     placeSafe(from);
                     *foundation = from;
@@ -972,10 +974,15 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
                     placeSafe(from);
                     to->nextCardCol = from;
-
                 }
             }
-        }
+
+        else if(Parameter[0]!='F' && canBePlaced(from, to)) {
+            placeSafe(from);
+            to->nextCardCol = from;
+            strcpy(messenge, "ok");
+
+        }}
 
             if(!cardInCol(getCol(Subcommand), from)){
                 sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
