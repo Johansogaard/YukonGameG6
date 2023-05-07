@@ -94,7 +94,7 @@ const char *SuitIntToCharTermial(int suit);
 void TakeOutOfFoundation(Card* head);
 bool isUnderMe(Card *from, Card *to);
 
-char* deckHasAllSuitsAndValues(Card* deck);
+char* deckHasAllSuitsAndValues(Card* deck, int lineNum);
 
 int main() {
 
@@ -534,8 +534,11 @@ Card* LD(char* filepath)
     Card* head = NULL;
     Card* cardBefore= NULL;
     int i = 0;
+
+    // Read the file line by line
     while  (fgets(singleLine,150,fPointer) !=NULL){
 
+        // If the current line is the first line, create a new linked list node and assign it to head
         if(head==NULL)
         {
             i++;
@@ -545,6 +548,8 @@ Card* LD(char* filepath)
             head->rank = getRank(singleLine[0]);
             cardBefore = head;
         }
+            // If the current line is not the first line, create a new linked list node and link it to the previous node
+
         else
         {
             i++;
@@ -558,17 +563,21 @@ Card* LD(char* filepath)
         }
 
     }
-    char* missingCards = deckHasAllSuitsAndValues(head);
+    char* missingCards = deckHasAllSuitsAndValues(head,__LINE__);
+
+    // Check if the deck contains more than 52 cards
     if(i>52)
     {
         sprintf(messenge, "File contains more than 52 cards and cannot be used", filepath);
         return NULL;
     }
-
+        // Check if the deck is missing any cards
     else if(missingCards != NULL)
     {
         sprintf(messenge, "File is missing the cards : %s",missingCards, filepath);
         return NULL;
+
+        // If the deck is valid, return the head of the linked list
     } else {
 
         cardBefore->nextCardDec = NULL;
@@ -576,7 +585,8 @@ Card* LD(char* filepath)
     }
 
 }
-char* deckHasAllSuitsAndValues(Card* deck) {
+// This function checks if the deck contains all 52 cards and returns a string of missing cards
+char* deckHasAllSuitsAndValues(Card* deck, int lineNum) {
     bool seen[4][13] = { false };
     Card* curr = deck;
     while (curr != NULL) {
@@ -596,8 +606,16 @@ char* deckHasAllSuitsAndValues(Card* deck) {
             }
         }
     }
-    return missingCards;
+
+    if (strlen(missingCards) == 0) {
+        return NULL;
+    } else {
+        char* errorMsg = malloc(sizeof(char) * 50);
+        sprintf(errorMsg, "File is missing the cards: %s (line %d)", missingCards, lineNum);
+        return errorMsg;
+    }
 }
+
 
 Card* createCard(int rank, int suit) {
     Card* newcard = malloc(sizeof(Card));
@@ -607,6 +625,8 @@ Card* createCard(int rank, int suit) {
     newcard->nextCardDec = NULL;  // initialize the next pointer to NULL
     return newcard;}
 
+// This function takes an integer representing the suit of a playing card,
+// and returns the corresponding character
 char getCharSuit(int Suit) {
     char suit;
     switch (Suit) {
@@ -627,7 +647,8 @@ char getCharSuit(int Suit) {
             break;
 
     }
-    return suit;
+    return suit; // Return the suit character
+
 }
 
 void saveToFile(char* File) {
@@ -699,17 +720,19 @@ void loadCards(char* file) {
 
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
+    //check if the list is empty
     if (head==NULL){
         strcpy(messenge, "No deck");
         return;
     }
+    // Try to open the file for writing.
     FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
         sprintf(messenge, "Wrong filepath %s", filename);
         return;
     }
 
-
+    // Traverse the linked list and write each card to the file.
     while (head != NULL) {
         fprintf(fp, "%c%c \n", RankIntToChar(head->rank), SuitIntToChar(head->suit));
         head = head->nextCardDec;
@@ -720,7 +743,7 @@ void saveList(Card *head, char *filename) {
 
 
 
-//ShuffleList - using double pointers, because
+//Shuffle cards
 void shuffleList(Card* head) {
     if (head==NULL){
         strcpy(messenge, "No deck");
@@ -873,43 +896,62 @@ void foundationMove(char* Command, char* Parameter) {
 
 
 void gameMove(char* Command, char* Parameter){
+    // Try to find the card specified by "Command" and "Parameter"
     Card *from = getCard(Command);
     Card *to;
      to=getCard(Parameter);
+
+    // If either card is not found, set the messenge string to an error message and return
     if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
         return;
     }
+    // If the move is valid and the destination column is empty, move the card to the new column and update the messenge string
     if (canBePlaced(from, to) && to->nextCardCol==NULL){
 
+        // If the card being moved was hidden, unhide it
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
+
+        // Update the pointers to move the card to the new column.
         youPointingAtMe(from)->nextCardCol=NULL;
         to->nextCardCol=from;
         sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
-        else if(colPointingToMe(from)){
+        // If the move is valid but the destination column is not empty, move the card anyway(places it on top of another card, and update the messenge string
+    else if(colPointingToMe(from)){
         to->nextCardCol=from;
         sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
+    //if move is invalid, error message
     else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
 
 }
-
+// This function searches for a specific card in the deck, given a string that specifies the card's rank and suit. The function returns a pointer
+// to the card if it is found, and sets the "messenge" string to an error message if the card is not found
 Card* getCard(char* input){
+
+    // Parsing the input string to get the desired rank and suit of the card.
     enum Suit desiredsuit = getSuit(input[1]);
     enum Rank desiredrank = getRank(input[0]);
+
+    //Start at the beginning of the deck and search for a card with the desired rank and suit.
     Card* head=Deck;
     while(head!=NULL){
         if (head->suit==desiredsuit && head->rank==desiredrank){
-            return head;
+            return head; // Return the card if it is found.
         }
         head=head->nextCardDec;
     }
+    // if card is not found return error message and NULL
     strcpy(messenge,"card not found");
     return NULL;
 }
 
+// This function searches for the card in the deck that is pointing at the given card. It returns a pointer to the card that is pointing at the given
+// card, or NULL if no such card is found
 Card* youPointingAtMe(Card* me){
+
+    // Start at the beginning of the deck and search for a card that is pointing at the given card
     Card* head=Deck;
     while(head!=NULL) {
         if (head->nextCardCol == me) {
