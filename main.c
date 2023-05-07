@@ -135,6 +135,7 @@ int main() {
 
 
         if(command==NULL){command=" ";}
+        if(subcommand==NULL){subcommand=" ";}
         if(!playmode){
         if (strcmp(command, "QQ") == 0) {
             printf("\ngame shutting down\n");
@@ -331,9 +332,9 @@ char* doCommand(char *command, char* parameter, char* subcommand) {
         }
     }
 
-        else {if((strcmp(subcommand, "SR"))==0 || (strcmp(command, "LD"))==0
-        || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0
-        || (strcmp(command, "QQ"))==0 ||(strcmp(command, "SW"))==0)
+        else {if((strcmp(subcommand, "SR"))==0 || (strcmp(subcommand, "LD"))==0
+        || (strcmp(subcommand, "SD"))==0 || (strcmp(subcommand, "P"))==0 || (strcmp(subcommand, "LD"))==0
+        || (strcmp(subcommand, "QQ"))==0 ||(strcmp(subcommand, "SW"))==0)
             {strcpy(messenge, "Command not available in the PLAY phase");}
 
             else if (strcmp(subcommand, "Q") == 0) {
@@ -730,7 +731,7 @@ void shuffleList(Card* head) {
 
 bool cardInCol(Card* col,Card* me){
     Card* current=col;
-
+    if(current==me){return true;}
     while(current->nextCardCol!=NULL){
         if (current==me||current->nextCardCol==me){
             return true;
@@ -1002,6 +1003,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 strcpy(messenge, "ok");
 
             }
+            else{strcpy(messenge, "illegal move");}
     }
 
     /*Card *from = getCard(Command);
