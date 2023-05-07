@@ -490,25 +490,30 @@ Card* LD(char* filepath)
     int i = 0;
     while  (fgets(singleLine,150,fPointer) !=NULL){
 
-        if(head==NULL)
-        {
-            i++;
-            head = malloc(sizeof(Card));
-              head->suit = getSuit(singleLine[2]);
-            head->hidden=true;
-            head->rank = getRank(singleLine[0]);
-            cardBefore = head;
+
+        if(head==NULL) {
+                if(singleLine[0]!=' '&&singleLine[1]!=' ') {
+                    i++;
+                    head = malloc(sizeof(Card));
+                    head->suit = getSuit(singleLine[1]);
+                    head->hidden = true;
+                    head->rank = getRank(singleLine[0]);
+                    cardBefore = head;
+                }
+
         }
         else
         {
-            i++;
-            Card* newCard =malloc(sizeof( Card));
-            newCard->hidden=true;
-            cardBefore->nextCardDec=newCard;
-            newCard->suit = getSuit(singleLine[2]);
-            newCard->rank = getRank(singleLine[0]);
-            cardBefore = newCard;
-            cardBefore->nextCardDec=NULL;
+            if (singleLine[0]!=' '&&singleLine[1]!=' ') {
+                Card* newCard =malloc(sizeof( Card));
+                i++;
+                newCard->hidden = true;
+                cardBefore->nextCardDec = newCard;
+                newCard->suit = getSuit(singleLine[1]);
+                newCard->rank = getRank(singleLine[0]);
+                cardBefore = newCard;
+                cardBefore->nextCardDec = NULL;
+            }
         }
 
     }
@@ -519,7 +524,7 @@ Card* LD(char* filepath)
         return NULL;
     }
 
-    else if(missingCards != NULL)
+    else if(strlen(missingCards) != 0)
     {
         sprintf(messenge, "File is missing the cards : %s",missingCards, filepath);
         return NULL;

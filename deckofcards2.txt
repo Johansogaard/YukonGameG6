@@ -1,5 +1,5 @@
-A C
-2C
+AC
+6H
 3C
 4C
 5C
@@ -29,6 +29,8 @@ AH
 3H
 4H
 5H
+2C
+7H
 8H
 9H
 TH
@@ -46,3 +48,5 @@ AS
 9S
 TS
 JS
+QS
+KS
