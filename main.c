@@ -355,8 +355,7 @@ char* doCommand(char *command, char* parameter, char* subcommand) {
 
 else if(subcommand!=NULL && parameter!=NULL /*&& (!(strcmp(command, parameter)))==0*/) {
 
-    if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
-     else if (strlen(subcommand) == 2 && strlen(parameter) == 2) {gameMove(command, parameter, subcommand);}
+     if (strlen(subcommand) == 2 && strlen(parameter) == 2) {gameMove(command, parameter, subcommand);}
     else {
         strcpy(messenge, "unknown command/illegal move");
     }
@@ -939,7 +938,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 placeSafe(from);
             *foundation = from;
             from->inFoundation=true;
-            }
+            }}
 
         else if (canBePlacedFoundation(from, to)&& (from->nextCardCol==NULL)) {
             // Move the card to the foundation pile
@@ -948,7 +947,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 to->nextCardCol = from;
                 from->inFoundation=true;
             }
-        }
+
     }
         else if(Parameter[0]!='F' && canBePlaced(from, to)) {
             placeSafe(from);
