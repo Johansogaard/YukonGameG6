@@ -376,29 +376,29 @@ void printFrow(int row)
     switch (row) {
         case 0:
             if (f1 != NULL) {
-                toPrint[0] = RankIntToChar(f1->rank);
-                toPrint[1] = SuitIntToChar(f1->suit);
+                toPrint[0] = RankIntToChar(cardAtEndOfCol(f1)->rank);
+                toPrint[1] = SuitIntToChar(cardAtEndOfCol(f1)->suit);
             }
             printf("%8s   F1", toPrint);
             break;
         case 1:
             if (f2!= NULL) {
-                toPrint[0] = RankIntToChar(f2->rank);
-                toPrint[1] = SuitIntToChar(f2->suit);
+                toPrint[0] = RankIntToChar(cardAtEndOfCol(f2)->rank);
+                toPrint[1] = SuitIntToChar(cardAtEndOfCol(f2)->suit);
             }
             printf("%8s   F2", toPrint);
             break;
         case 2:
             if (f3 != NULL) {
-                toPrint[0] = RankIntToChar(f3->rank);
-                toPrint[1] = SuitIntToChar(f3->suit);
+                toPrint[0] = RankIntToChar(cardAtEndOfCol(f3)->rank);
+                toPrint[1] = SuitIntToChar(cardAtEndOfCol(f3)->suit);
             }
             printf("%8s   F3", toPrint);
             break;
         case 3:
             if (f4 != NULL) {
-                toPrint[0] = RankIntToChar(f4->rank);
-                toPrint[1] = SuitIntToChar(f4->suit);
+                toPrint[0] = RankIntToChar(cardAtEndOfCol(f4)->rank);
+                toPrint[1] = SuitIntToChar(cardAtEndOfCol(f4)->suit);
             }
             printf("%8s   F4", toPrint);
             break;
@@ -998,7 +998,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 }
             }
 
-        else if(Parameter[0]!='F' && canBePlaced(from, to)) {
+        else if(Parameter[0]!='F' && canBePlaced(from, to) && !isUnderMe(from, to)) {
             placeSafe(from);
             to->nextCardCol = from;
             from->inFoundation=false;
