@@ -567,7 +567,7 @@ Card* LD(char* filepath)
         }
 
     }
-    char* missingCards = deckHasAllSuitsAndValues(head,__LINE__);
+    char* missingCards = deckHasAllSuitsAndValues(head);
 
     // Check if the deck contains more than 52 cards
     if(i>52)
@@ -590,7 +590,7 @@ Card* LD(char* filepath)
 
 }
 // This function checks if the deck contains all 52 cards and returns a string of missing cards
-char* deckHasAllSuitsAndValues(Card* deck, int lineNum) {
+char* deckHasAllSuitsAndValues(Card* deck) {
     bool seen[4][13] = { false };
     Card* curr = deck;
     while (curr != NULL) {
