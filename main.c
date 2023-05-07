@@ -553,7 +553,9 @@ char* deckHasAllSuitsAndValues(Card* deck) {
     bool seen[4][13] = { false };
     Card* curr = deck;
     while (curr != NULL) {
-        seen[curr->suit][curr->rank] = true;
+        if(curr->suit>=0&&curr->suit<4&&curr->rank>=0&&curr->rank<13) {
+            seen[curr->suit][curr->rank] = true;
+        }
         curr = curr->nextCardDec;
     }
     char* missingCards = malloc(sizeof(char) * 156);
