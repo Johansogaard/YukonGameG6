@@ -163,30 +163,54 @@ int main() {
     */
 
 }
+/*
+Adds cards to the columns based on the specified game mode.
+cards: pointer to the head of the linked list of cards to be added to the columns.
+playmode: boolean that determines whether cards are added for playing or dealing purposes.
+ */
 void addCards(Card *cards, bool playmode)
 {
+    // row counter and index counter variables
     int row = 0;
     int i = 0;
+
+    // array of pointers to each column
     Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
+
+    // array to keep track of whether a column has been set
     bool setcard[] = {false,true,true,true,true,true,true};
 
     if (playmode) {
+        // loop through each column
         for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
+            // set the current column to the head of the cards list
             c[j] = cards;
+
+            // set the nextCardCol pointer of the last card in the current column to NULL
             getCardAtIndexInCol(c[i], row)->nextCardCol = NULL;
+
+            // set the hidden attribute of all cards in columns 2 through 7 to true
             if(j>0)
             {
                 c[j]->hidden=true;
 
+                // set the hidden attribute of the first card in column 1 to false
             } else
             {
                 c[j]->hidden=false;
             }
+
+            // move to the next card in the list
             cards = cards->nextCardDec;
         }
+        // loop through the remaining cards in the list
         while (cards != NULL) {
+
+            // calculate the value of sethid, which determines how many cards should be hidden
             int sethid =1;
             sethid = sethid+row;
+
+            // set the hidden attribute of the current card based on its position in the layout
             if(i>sethid)
             {
                 cards->hidden=true;
@@ -194,15 +218,25 @@ void addCards(Card *cards, bool playmode)
             {
                 cards->hidden=false;
             }
+
+            // if the current column has not been set, add the current card to it
             if(setcard[i] ==true) {
                 getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
+
+                // move to the next card in the list
                 cards = cards->nextCardDec;
+                // set the nextCardCol pointer of the last card in the current column to NULL
                 getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
             }
+            // increment the index counter and handle the wrapping
             i = (i + 1) % 7;
+
+            // increment the row counter if the index has wrapped around
             if (i == 0) {
                 row++;
             }
+
+            // set the corresponding element in the setcard array to false if the row has reached a certain value
             switch (row) {
                 case 5:
                     setcard[1] = false;
@@ -226,15 +260,18 @@ void addCards(Card *cards, bool playmode)
         }
         }
     else {
+// loop through each column and assign a card to each column
         for (int j = 0; j < (sizeof(c) / sizeof(c1)); ++j) {
             c[j] = cards;
             cards = cards->nextCardDec;
         }
 
-
+// Loop through remaining cards and assign them to the columns
         while (cards != NULL) {
+            // assign the next card in the deck to the specified column and row
             getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
             cards = cards->nextCardDec;
+            // set the next card in the row to NULL
             getCardAtIndexInCol(c[i], row + 1)->nextCardCol = NULL;
             i = (i + 1) % 7;
             if (i == 0) {
@@ -244,6 +281,7 @@ void addCards(Card *cards, bool playmode)
 
 
     }
+    // Assign each column to its respective variable
     c1 = c[0];
     c2 = c[1];
     c3 = c[2];
@@ -255,15 +293,16 @@ void addCards(Card *cards, bool playmode)
 
 
 char* doCommand(char *command, char* parameter) {
+    // Check if game is in startup phase
     if (!playmode) {
 
-
-         if (strcmp(command, "LD") == 0) {
-            if (parameter == NULL) {
+        // Execute command based on input
+         if (strcmp(command, "LD") == 0) {// Load deck
+            if (parameter == NULL) {// If no parameter is given, create a new deck
                 strcpy(messenge, "OK");
                 Deck = createDeck();
                 addCards(Deck, playmode);
-            } else {
+            } else {// Load deck from file
                 strcpy(messenge, "OK");
 
                 Deck = LD(parameter);
@@ -271,73 +310,80 @@ char* doCommand(char *command, char* parameter) {
 
             }
         }
-         else if (strcmp(command, "SL") == 0) {
-
-            if (parameter == NULL) {
+         else if (strcmp(command, "SL") == 0) {// Split deck
+            if (parameter == NULL) {// If no parameter is given, split the deck randomly
                 srand ( time(NULL) );
                 split(Deck, numCards(Deck), rand() % getlength(Deck));
 
-            } else {
+            } else {// If parameter is given, split the deck at the given index
                 int splitvalid = true;
                 for (int i = 0; parameter[i] != '\0'; i++) {
-                    if (!isdigit(parameter[i])) {
+                    if (!isdigit(parameter[i])) {// Check if parameter is a valid integer
+                        splitvalid = false;
                         splitvalid = false;
                     }
                 }
                 if (splitvalid) {
 
                     split(Deck, numCards(Deck),  atoi(parameter));
-                } else { strcpy(messenge, "SL takes int as parameter"); }
+                } else {// If parameter is not a valid integer, show an error message
+                    strcpy(messenge, "SL takes int as parameter"); }
             }
 
-        } else if (strcmp(command, "SD") == 0) {
-             if (parameter == NULL) {saveList(Deck, "relativ filepath");}
+        } else if (strcmp(command, "SD") == 0) {// Save deck
+             if (parameter == NULL) {// If no parameter is given, save deck to default file
+                 saveList(Deck, "relativ filepath");}
+             // If parameter is given, save deck to the given file
             saveList(Deck, parameter);
 
 
-        }  else if (strcmp(command, "SR") == 0){
-
+        }  else if (strcmp(command, "SR") == 0){// Shuffle deck
             shuffleList(Deck);
             strcpy(messenge, "shuffled cards");}
 
 
-         else if (strcmp(command, "SW") == 0) {
+         else if (strcmp(command, "SW") == 0) {// Show deck
             show++;
             strcpy(messenge, "OK");}
 
-         else if (strcmp(command, "P") == 0) {
+         else if (strcmp(command, "P") == 0) {// Play mode
             strcpy(messenge, "Game is in playphase");
             playmode = true;
             addCards(Deck, playmode);
         }
 
-        else {strcpy(messenge, "unknown command");
+        else {// If the input command is not recognized, show an error message
+            strcpy(messenge, "unknown command");
         }
     }
-
-        else {if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0
+// Check if game is in play phase
+        else {
+        // If command is not allowed during play phase, display error message
+        if((strcmp(command, "SR"))==0 || (strcmp(command, "LD"))==0
         || (strcmp(command, "SD"))==0 || (strcmp(command, "P"))==0 || (strcmp(command, "LD"))==0
         || (strcmp(command, "QQ"))==0 ||(strcmp(command, "SW"))==0)
             {strcpy(messenge, "Command not available in the PLAY phase");}
-
+// If command is to quit the game, display message, reset game variables, and remove cards from foundation
             else if (strcmp(command, "Q") == 0) {
                 strcpy(messenge, "Game is in startup phase");
                 playmode = false;
                 f1=f2=f3=f4=NULL;
                 TakeOutOfFoundation(Deck);}
-
+// If command is to save the game, display message and save game to file
             else if (strcmp(command, "S") == 0){
                 sprintf(messenge, "saved game to %s", parameter);
                 saveToFile(parameter);}
-
+// If command is to load a saved game, display message and load cards from file
             else if (strcmp(command, "L") == 0){
                 sprintf(messenge, "loaded game from %s", parameter);
                 loadCards(parameter);}
 
-
+// If command is a move command, check for validity of move and execute it
 else if(command!=NULL && parameter!=NULL && (!(strcmp(command, parameter)))==0) {
-    if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
-     else if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
+            // If move is a foundation move, execute it
+            if (parameter[0]=='F' && (strlen(command) == 2 && strlen(parameter) == 2)){ foundationMove(command, parameter );}
+                // If move is a game move, execute it
+            else if (strlen(command) == 2 && strlen(parameter) == 2) {gameMove(command, parameter);}
     else {
         strcpy(messenge, "unknown command/illegal move");
     }
@@ -488,6 +534,8 @@ Card* LD(char* filepath)
     Card* head = NULL;
     Card* cardBefore= NULL;
     int i = 0;
+
+    // Read the file line by line
     while  (fgets(singleLine,150,fPointer) !=NULL){
 
 
@@ -502,6 +550,8 @@ Card* LD(char* filepath)
                 }
 
         }
+            // If the current line is not the first line, create a new linked list node and link it to the previous node
+
         else
         {
             if (singleLine[0]!=' '&&singleLine[1]!=' ') {
@@ -517,7 +567,9 @@ Card* LD(char* filepath)
         }
 
     }
-    char* missingCards = deckHasAllSuitsAndValues(head);
+    char* missingCards = deckHasAllSuitsAndValues(head,__LINE__);
+
+    // Check if the deck contains more than 52 cards
     if(i>52)
     {
         sprintf(messenge, "File contains more than 52 cards and cannot be used", filepath);
@@ -528,6 +580,8 @@ Card* LD(char* filepath)
     {
         sprintf(messenge, "File is missing the cards : %s",missingCards, filepath);
         return NULL;
+
+        // If the deck is valid, return the head of the linked list
     } else {
 
         cardBefore->nextCardDec = NULL;
@@ -535,7 +589,8 @@ Card* LD(char* filepath)
     }
 
 }
-char* deckHasAllSuitsAndValues(Card* deck) {
+// This function checks if the deck contains all 52 cards and returns a string of missing cards
+char* deckHasAllSuitsAndValues(Card* deck, int lineNum) {
     bool seen[4][13] = { false };
     Card* curr = deck;
     while (curr != NULL) {
@@ -568,6 +623,8 @@ Card* createCard(int rank, int suit) {
     newcard->nextCardDec = NULL;  // initialize the next pointer to NULL
     return newcard;}
 
+// This function takes an integer representing the suit of a playing card,
+// and returns the corresponding character
 char getCharSuit(int Suit) {
     char suit;
     switch (Suit) {
@@ -588,7 +645,8 @@ char getCharSuit(int Suit) {
             break;
 
     }
-    return suit;
+    return suit; // Return the suit character
+
 }
 
 void saveToFile(char* File) {
@@ -660,17 +718,19 @@ void loadCards(char* file) {
 
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
+    //check if the list is empty
     if (head==NULL){
         strcpy(messenge, "No deck");
         return;
     }
+    // Try to open the file for writing.
     FILE *fp = fopen(filename, "w");
     if (fp == NULL) {
         sprintf(messenge, "Wrong filepath %s", filename);
         return;
     }
 
-
+    // Traverse the linked list and write each card to the file.
     while (head != NULL) {
         fprintf(fp, "%c%c \n", RankIntToChar(head->rank), SuitIntToChar(head->suit));
         head = head->nextCardDec;
@@ -681,7 +741,7 @@ void saveList(Card *head, char *filename) {
 
 
 
-//ShuffleList - using double pointers, because
+//Shuffle cards
 void shuffleList(Card* head) {
     if (head==NULL){
         strcpy(messenge, "No deck");
@@ -834,53 +894,71 @@ void foundationMove(char* Command, char* Parameter) {
 
 
 void gameMove(char* Command, char* Parameter){
+    // Try to find the card specified by "Command" and "Parameter"
     Card *from = getCard(Command);
     Card *to;
      to=getCard(Parameter);
+
+    // If either card is not found, set the messenge string to an error message and return
     if (from==NULL || to==NULL){
         strcpy(messenge, "CARD not found");
         return;
     }
+    // If the move is valid and the destination column is empty, move the card to the new column and update the messenge string
     if (canBePlaced(from, to) && to->nextCardCol==NULL){
 
+        // If the card being moved was hidden, unhide it
         if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
+
+        // Update the pointers to move the card to the new column.
         youPointingAtMe(from)->nextCardCol=NULL;
         to->nextCardCol=from;
         sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
-        else if(colPointingToMe(from)){
+        // If the move is valid but the destination column is not empty, move the card anyway(places it on top of another card, and update the messenge string
+    else if(colPointingToMe(from)){
         to->nextCardCol=from;
         sprintf(messenge, "Moved %s to %s", Command, Parameter);
         }
+    //if move is invalid, error message
     else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
 
 }
-
+// This function searches for a specific card in the deck, given a string that specifies the card's rank and suit. The function returns a pointer
+// to the card if it is found, and sets the "messenge" string to an error message if the card is not found
 Card* getCard(char* input){
+
+    // Parsing the input string to get the desired rank and suit of the card.
     enum Suit desiredsuit = getSuit(input[1]);
     enum Rank desiredrank = getRank(input[0]);
+
+    //Start at the beginning of the deck and search for a card with the desired rank and suit.
     Card* head=Deck;
     while(head!=NULL){
         if (head->suit==desiredsuit && head->rank==desiredrank){
-            return head;
+            return head; // Return the card if it is found.
         }
         head=head->nextCardDec;
     }
+    // if card is not found return error message and NULL
     strcpy(messenge,"card not found");
     return NULL;
 }
 
+// This function searches for the card in the deck that is pointing at the given card. It returns a pointer to the card that is pointing at the given card
 Card* youPointingAtMe(Card* me){
+
+    // Start at the beginning of the deck and search for a card that is pointing at the given card
     Card* head=Deck;
     while(head!=NULL) {
         if (head->nextCardCol == me) {
-            return head;
+            return head; // Return the card that is pointing at the given card
         }
         head = head->nextCardDec;
     }
 
 }
-
+//counts the number of cards in the deck and returns integer with the count
 int numCards(Card* deck) {
     int count = 0;
     Card* current = deck;
