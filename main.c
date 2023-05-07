@@ -5,7 +5,7 @@
 #include <ctype.h>
 #include <time.h>
 
-char messenge[100] = "";
+char messenge[200] = "";
 char input[100] = "";
 char parameter[100] = "";
 bool playmode = false;
@@ -97,8 +97,9 @@ bool cardInCol(Card* col,Card* me);
 Card* cardAtEndOfCol(Card* col);
 Card* getCol(char* colName);
 void placeSafe(Card* from);
-bool deckHasAllSuitsAndValues(Card* deck);
 Card ** getFoundation(char* Parameter);
+char* deckHasAllSuitsAndValues(Card* deck);
+
 
 
 int main() {
@@ -527,17 +528,20 @@ Card* LD(char* filepath)
             newCard->suit = getSuit(singleLine[2]);
             newCard->rank = getRank(singleLine[0]);
             cardBefore = newCard;
+            cardBefore->nextCardDec=NULL;
         }
 
     }
+    char* missingCards = deckHasAllSuitsAndValues(head);
     if(i>52)
     {
         sprintf(messenge, "File contains more than 52 cards and cannot be used", filepath);
         return NULL;
     }
-    else if(deckHasAllSuitsAndValues(head)==false)
+
+    else if(missingCards != NULL)
     {
-        sprintf(messenge, "File dosent contain the correct cards with the correct suit and value for a full deck of cards", filepath);
+        sprintf(messenge, "File is missing the cards : %s",missingCards, filepath);
         return NULL;
     } else {
 
@@ -546,21 +550,27 @@ Card* LD(char* filepath)
     }
 
 }
-bool deckHasAllSuitsAndValues(Card* deck) {
+char* deckHasAllSuitsAndValues(Card* deck) {
     bool seen[4][13] = { false };
     Card* curr = deck;
     while (curr != NULL) {
         seen[curr->suit][curr->rank] = true;
         curr = curr->nextCardDec;
     }
+    char* missingCards = malloc(sizeof(char) * 156);
+    missingCards[0] = '\0'; // initialize the string to an empty string
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 13; j++) {
             if (!seen[i][j]) {
-                return false;
+                char value = RankIntToChar(j);
+                char suit = getCharSuit(i);
+                char valueSuit[3];
+                sprintf(valueSuit, "%c%c ", value, suit);
+                strcat(missingCards, valueSuit);
             }
         }
     }
-    return true;
+    return missingCards;
 }
 
 Card* createCard(int rank, int suit) {
