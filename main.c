@@ -947,21 +947,20 @@ Card* getCard(char* input){
     return NULL;
 }
 
-// This function searches for the card in the deck that is pointing at the given card. It returns a pointer to the card that is pointing at the given
-// card, or NULL if no such card is found
+// This function searches for the card in the deck that is pointing at the given card. It returns a pointer to the card that is pointing at the given card
 Card* youPointingAtMe(Card* me){
 
     // Start at the beginning of the deck and search for a card that is pointing at the given card
     Card* head=Deck;
     while(head!=NULL) {
         if (head->nextCardCol == me) {
-            return head;
+            return head; // Return the card that is pointing at the given card
         }
         head = head->nextCardDec;
     }
 
 }
-
+//counts the number of cards in the deck and returns integer with the count
 int numCards(Card* deck) {
     int count = 0;
     Card* current = deck;
