@@ -962,7 +962,8 @@ void placeSafe(Card* from){
             youPointingAtMe(from)->hidden = false;
         }
         youPointingAtMe(from)->nextCardCol = NULL;
-    }}
+
+    }strcpy(messenge, "OK");}
 
 Card ** getFoundation(char* Parameter){
     switch (Parameter[1]) {
@@ -1039,10 +1040,9 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
             }
 
     }
-        else if(Parameter[0]!='F' && canBePlaced(from, to)) {
+        else if(Parameter[0]!='F' && getCol(Parameter)&& canBePlaced(from, to) && getCol(Parameter)) {
             placeSafe(from);
             to->nextCardCol = from;
-            strcpy(messenge, "ok");
 
     }
         else{strcpy(messenge, "illegal move");}
@@ -1085,11 +1085,10 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
             sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
             return;}
 
-         if(canBePlaced(from, to) && !isUnderMe(from, to)) {
+         if(getCol(Parameter)&&canBePlaced(from, to) && !isUnderMe(from, to)) {
             placeSafe(from);
             to->nextCardCol = from;
             from->inFoundation=false;
-            strcpy(messenge, "ok");
 
 
         }
