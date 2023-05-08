@@ -66,8 +66,6 @@ Card* createCard(int rank, int suit);
 enum Suit getSuit(char suit);
 enum Rank getRank(char value);
 int numCards(Card* deck);
-void printList(Card *c);
-void swapCards(Card* card1, Card* card2);
 Card *getCardAtIndexInDeck(Card *head, int index);
 void makeBoard(char *lc,char *msg, char *parameter);
 void printFrow(int row);
@@ -87,7 +85,6 @@ Card* youPointingAtMe(Card* me);
 Card *getCardAtIndexInCol(Card *head, int index);
 void saveToFile(char* File);
 void loadCards(char* File);
-void foundationMove(char* Command, char* Parameter);
 bool colPointingToMe(Card* Me);
 void hide(Card* head);
 const char *SuitIntToCharTermial(int suit);
@@ -161,8 +158,6 @@ int main() {
 
 
     }
-
-
 
 }
 /*
@@ -973,8 +968,6 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
     }
 
 
-
-
     else{
             Card* from=getCard(Command);
 
@@ -1026,33 +1019,6 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
          else{strcpy(messenge, "illegal move");}
     }
     }
-
-    /*Card *from = getCard(Command);
-    Card *to;
-     to=getCard(Parameter);
-    if (from==NULL || to==NULL){
-        strcpy(messenge, "CARD not found");
-        return;
-    }
-    // If the move is valid and the destination column is empty, move the card to the new column and update the messenge string
-    if (canBePlaced(from, to) && to->nextCardCol==NULL){
-
-        // If the card being moved was hidden, unhide it
-        if (youPointingAtMe(from)->hidden==true){youPointingAtMe(from)->hidden=false;}
-
-        // Update the pointers to move the card to the new column.
-        youPointingAtMe(from)->nextCardCol=NULL;
-        to->nextCardCol=from;
-        sprintf(messenge, "Moved %s to %s", Command, Parameter);
-        }
-        // If the move is valid but the destination column is not empty, move the card anyway(places it on top of another card, and update the messenge string
-    else if(colPointingToMe(from)){
-        to->nextCardCol=from;
-        sprintf(messenge, "Moved %s to %s", Command, Parameter);
-        }
-    //if move is invalid, error message
-    else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
-*/
 
 Card* getCard(char* input){
 
@@ -1335,18 +1301,6 @@ Card *getCardAtIndexInCol(Card *head, int index)
     return head;
 }
 
-
-// Helper function to swap two cards
-/*void swapCards(Card* card1, Card* card2)
-{
-    int temp_rank = card1->rank;
-    enum Suit temp_suit = card1->suit;
-    card1->rank = card2->rank;
-    card1->suit = card2->suit;
-    card2->rank = temp_rank;
-    card2->suit = temp_suit;
-}
-*/
 int getlength(Card* head) {
     int count = 0;
     Card* current = head;
