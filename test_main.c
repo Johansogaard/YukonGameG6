@@ -33,8 +33,38 @@ void test_shuffleList() {
     printf("\n");
 }
 
+void test_split() {
+    // Create a deck of cards
+    Card* deck = createDeck();
+    // Shuffle the deck
+    shuffleList(deck);
+    // Split the deck
+    split(deck, 52, 26);
+    // Check that the number of cards in each pile is correct
+    assert(getlength(deck) == 51);
+    assert(getlength(deck->nextCardDec) == 26);
+    assert(getlength(deck->nextCardDec->nextCardDec) == 26);
+    // Check that the cards in the original deck are distributed correctly
+    Card* current = deck;
+    int i;
+    for (i = 0; i < split; i++) {
+        current = current->nextCardDec;
+    }
+    Card* pile1 = deck->nextCardDec;
+    Card* pile2 = current->nextCardDec;
+    for (i = 0; i < split; i++) {
+        assert(pile1->rank == deck->rank && pile1->suit == deck->suit);
+        assert(pile2->rank == current->rank && pile2->suit == current->suit);
+        pile1 = pile1->nextCardDec;
+        pile2 = pile2->nextCardDec;
+    }
+}
+
+
 int main() {
     // Call the shuffleList() test function
     test_shuffleList();
-
+    // Call the split() test function
+    test_split();
+return 0;
 }
