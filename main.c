@@ -973,13 +973,15 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
             Card* to=cardAtEndOfCol(getCol(Parameter));
 
+        if(!cardInCol(getCol(Subcommand), from)){
+            sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
+            return;}
+
         if(from==NULL || !isACol(Parameter)){strcpy(messenge, "wrong input"); return;}
 
         if(Parameter[0]=='F'&& from->inFoundation==false && from->nextCardCol==NULL) {
 
-            if(!cardInCol(getCol(Subcommand), from)){
-                sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
-                return;}
+
 
             Card **foundation=getFoundation(Parameter);
 
@@ -1004,9 +1006,6 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
 
         else if(Parameter[0]!='F' && Subcommand[0]!='F'){
-         if(!cardInCol(getCol(Subcommand), from)){
-            sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
-            return;}
 
          if(getCol(Parameter)&&canBePlaced(from, to) && !isUnderMe(from, to)) {
 
