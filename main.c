@@ -99,7 +99,7 @@ Card* getCol(char* colName);
 void placeSafe(Card* from);
 Card ** getFoundation(char* Parameter);
 char* deckHasAllSuitsAndValues(Card* deck);
-
+bool isACol(char* colName);
 
 
 int main() {
@@ -922,6 +922,33 @@ Card ** getFoundation(char* Parameter){
                             return NULL;
     }}
 
+    bool isACol(char* colName){
+        if (strcmp(colName, "C1") == 0) {
+            return true;
+        } else if (strcmp(colName, "C2") == 0) {
+            return true;
+        } else if (strcmp(colName, "C3") == 0) {
+            return true;
+        } else if (strcmp(colName, "C4") == 0) {
+            return true;
+        } else if (strcmp(colName, "C5") == 0) {
+            return true;
+        } else if (strcmp(colName, "C6") == 0) {
+            return true;
+        } else if (strcmp(colName, "C7") == 0) {
+            return true;
+        } else if (strcmp(colName, "F1") == 0) {
+            return true;
+        } else if (strcmp(colName, "F2") == 0) {
+            return true;
+        } else if (strcmp(colName, "F3") == 0) {
+            return true;
+        } else if (strcmp(colName, "F4") == 0) {
+            return true;
+        } else {
+            return false;
+        }
+}
 
 void gameMove(char* Command, char* Parameter, char*Subcommand){
 
@@ -932,7 +959,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
         Card* to=cardAtEndOfCol(getCol(Parameter));
 
-    if(from==NULL){strcpy(messenge, "wrong input"); return;}
+    if(from==NULL || !isACol(Parameter)){strcpy(messenge, "wrong input"); return;}
 
     if(Parameter[0]=='F' && from->inFoundation==false) {
 
@@ -970,7 +997,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
             Card* to=cardAtEndOfCol(getCol(Parameter));
 
-        if(from==NULL){strcpy(messenge, "wrong input"); return;}
+        if(from==NULL || !isACol(Parameter)){strcpy(messenge, "wrong input"); return;}
 
         if(Parameter[0]=='F'&& from->inFoundation==false) {
 
@@ -996,30 +1023,27 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                     to->nextCardCol = from;
                     from->inFoundation=true;
                 }
-            }
+            }}
+        else if(Parameter[0]!='F'){
+         if(!cardInCol(getCol(Subcommand), from)){
+            sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
+            return;}
 
-        else if(Parameter[0]!='F' && canBePlaced(from, to) && !isUnderMe(from, to)) {
+         if(canBePlaced(from, to) && !isUnderMe(from, to)) {
             placeSafe(from);
             to->nextCardCol = from;
             from->inFoundation=false;
             strcpy(messenge, "ok");
 
-        }}
 
-            if(!cardInCol(getCol(Subcommand), from)){
-                sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
-                return;}
+        }
+
+        }
+
+         else{strcpy(messenge, "illegal move");}
+    }
 
 
-
-            if (canBePlaced(from, to)) {
-                placeSafe(from);
-                to->nextCardCol = from;
-                from->inFoundation=false;
-                strcpy(messenge, "ok");
-
-            }
-            else{strcpy(messenge, "illegal move");}
     }
 
     /*Card *from = getCard(Command);
@@ -1042,7 +1066,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
         }
     else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
 */
- }
+
 
 Card* getCard(char* input){
     enum Suit desiredsuit = getSuit(input[1]);
