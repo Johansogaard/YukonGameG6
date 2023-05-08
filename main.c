@@ -159,7 +159,6 @@ int main() {
 
         }
 
-
         makeBoard(command, messenge, originput);
 
         /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
@@ -1039,6 +1038,8 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 from->inFoundation=true;
             }
 
+        else{strcpy(messenge, "illegal move");}
+
     }
         else if(Parameter[0]!='F' && getCol(Parameter)&& canBePlaced(from, to) && getCol(Parameter)) {
             placeSafe(from);
@@ -1079,6 +1080,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                     to->nextCardCol = from;
                     from->inFoundation=true;
                 }
+                else{strcpy(messenge, "illegal move");}
             }}
         else if(Parameter[0]!='F'){
          if(!cardInCol(getCol(Subcommand), from)){
