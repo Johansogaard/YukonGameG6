@@ -35,10 +35,6 @@ int isBlack(Card *card) {
     return card->suit == C || card->suit == S;
 }
 
-int isRed(Card *card) {
-    return card->suit == H || card->suit == D;
-}
-
 int isDifferentColor(Card *higher, Card *lower) {
     return isBlack(higher) != isBlack(lower);
 }
@@ -104,7 +100,6 @@ int main() {
     makeBoard(input,messenge, parameter);
     while (true)
     {
-
             char *command=NULL;
             char *subcommand=NULL;
             char *parameter;
@@ -112,7 +107,8 @@ int main() {
 
         // remove the newline character at the end of the input
         input[strcspn(input, "\n")] = 0;
-        char *originput=input;
+        char *originput = malloc(strlen(input) + 1);
+        strcpy(originput, input);
         // tokenize the input string to extract the command and parameter
         if (!playmode) {
             command = strtok(input, " ");
@@ -126,18 +122,14 @@ int main() {
             subcommand = strtok(input, ":");
             command = strtok(NULL, "-");
             parameter = strtok(NULL, ">");
-
         }
-
 
         if(command==NULL){command=" ";}
         if(subcommand==NULL){subcommand=" ";}
         if(!playmode){
         if (strcmp(command, "QQ") == 0) {
             printf("\ngame shutting down\n");
-            break;
-        }
-        }
+            break;}}
         //does the commandLD
         //printf("%s",parameter);
         if(Deck!=NULL || strcmp(command, "LD")==0) {
@@ -153,12 +145,8 @@ int main() {
             else{hide(Deck);}
 
         }
-
         makeBoard(command, messenge, originput);
-
-
     }
-
 }
 /*
 Adds cards to the columns based on the specified game mode.
@@ -196,7 +184,6 @@ void addCards(Card *cards, bool playmode)
             {
                 c[j]->hidden=false;
             }
-
             // move to the next card in the list
             cards = cards->nextCardDec;
         }
@@ -215,7 +202,6 @@ void addCards(Card *cards, bool playmode)
             {
                 cards->hidden=false;
             }
-
             // if the current column has not been set, add the current card to it
             if(setcard[i] ==true) {
                 getCardAtIndexInCol(c[i], row)->nextCardCol = cards;
@@ -275,8 +261,6 @@ void addCards(Card *cards, bool playmode)
                 row++;
             }
         }
-
-
     }
     // Assign each column to its respective variable
     c1 = c[0];
@@ -287,8 +271,6 @@ void addCards(Card *cards, bool playmode)
     c6 = c[5];
     c7 = c[6];
 }
-
-
 
 char* doCommand(char *command, char* parameter, char* subcommand) {
     if (!playmode) {
@@ -448,7 +430,6 @@ void makeBoard(char *lc,char *msg, char *input)
 {
     printf("C1\tC2\tC3\tC4\tC5\tC6\tC7\n\n");
 
-
     int row = 0;
     bool isemtpy = false;
 
@@ -471,19 +452,8 @@ void makeBoard(char *lc,char *msg, char *input)
 
     printf("\nMessage: %s\n",msg);
     printf("INPUT >");
-
-
 }
-/*void printList(Card* c)
-{
-    int i =0;
-    while (c != NULL) {
-        i++;
-        printf(" %c, %c\n", RankIntToChar(c->rank), SuitIntToChar(c->suit));
 
-        c = c->nextCardDec;
-    }
-}*/
 Card* createDeck() {
     Card* head = NULL;
     Card* last = NULL;
@@ -539,7 +509,6 @@ Card* LD(char* filepath)
                     head->rank = getRank(singleLine[0]);
                     cardBefore = head;
                 }
-
         }
             // If the current line is not the first line, create a new linked list node and link it to the previous node
 
@@ -556,7 +525,6 @@ Card* LD(char* filepath)
                 cardBefore->nextCardDec = NULL;
             }
         }
-
     }
     char* missingCards = deckHasAllSuitsAndValues(head);
 
@@ -578,7 +546,6 @@ Card* LD(char* filepath)
         cardBefore->nextCardDec = NULL;
         return head;
     }
-
 }
 // This function checks if the deck contains all 52 cards and returns a string of missing cards
 char* deckHasAllSuitsAndValues(Card* deck) {
@@ -703,7 +670,6 @@ void loadCards(char* file) {
 
     fclose(fp);
 }
-
 
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
