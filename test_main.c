@@ -33,8 +33,29 @@ void test_shuffleList() {
     printf("\n");
 }
 
+void test_split(){
+
+    //load deck which is manually created for a split of 10
+    Card* deck = LD("/Users/mikkel/Desktop/Cprojekter/YukonGameG6/deckofcardsSplitTest.txt");
+
+    //split deck at 10
+    Card* Deck = LD("/Users/mikkel/Desktop/Cprojekter/YukonGameG6/deckofcardsSplitTest2.txt");
+    split(Deck, numCards(Deck), 10);
+
+    bool isShuffled = !isDeckEqual(deck, Deck);
+    printf("Test 02: split()\n");
+    if (isShuffled) {
+        printf("PASSED: split() split the deck correctly\n");
+    } else {
+        printf("FAILED: split() did not match prefixed deck\n");
+    }
+    printf("\n");
+
+
+}
+
 int main() {
     // Call the shuffleList() test function
     test_shuffleList();
-
+    test_split();
 }
