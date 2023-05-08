@@ -113,7 +113,6 @@ int main() {
             char *parameter;
         fgets(input, sizeof(input), stdin);
 
-
         // remove the newline character at the end of the input
         input[strcspn(input, "\n")] = 0;
         char *originput=input;
@@ -132,7 +131,6 @@ int main() {
             parameter = strtok(NULL, ">");
 
         }
-        printf("%s %s %s\n", subcommand, command, parameter);
 
 
         if(command==NULL){command=" ";}
@@ -406,9 +404,6 @@ else if(subcommand!=NULL && parameter!=NULL /*&& (!(strcmp(command, parameter)))
                 strcpy(messenge, "unknown command");
             }
         }
-
-
-
 }
 void printFrow(int row)
 {
@@ -497,7 +492,7 @@ void makeBoard(char *lc,char *msg, char *input)
 
 
 }
-void printList(Card* c)
+/*void printList(Card* c)
 {
     int i =0;
     while (c != NULL) {
@@ -506,7 +501,7 @@ void printList(Card* c)
 
         c = c->nextCardDec;
     }
-}
+}*/
 Card* createDeck() {
     Card* head = NULL;
     Card* last = NULL;
@@ -660,7 +655,6 @@ char getCharSuit(int Suit) {
 
     }
     return suit; // Return the suit character
-
 }
 
 void saveToFile(char* File) {
@@ -686,7 +680,6 @@ void saveToFile(char* File) {
             current = current->nextCardCol;
         }
     }
-
     fclose(fp);
 }
 
@@ -752,8 +745,6 @@ void saveList(Card *head, char *filename) {
     sprintf(messenge, "Saved deck to %s", filename);
     fclose(fp);
 }
-
-
 
 //Shuffle cards
 void shuffleList(Card* head) {
@@ -878,12 +869,24 @@ bool colPointingToMe(Card* Me){
         c7 = NULL; // Make c7 a null pointer
         return true;
     }
+    if (f1 != NULL && f1 == Me) {
+        f1 = NULL; // Make c7 a null pointer
+        return true;}
+    if (f2 != NULL && f2 == Me) {
+        f2 = NULL; // Make c7 a null pointer
+        return true;}
+    if (f3 != NULL && f3 == Me) {
+        f3 = NULL; // Make c7 a null pointer
+        return true;}
+    if (f4 != NULL && f4 == Me) {
+        f4 = NULL; // Make c7 a null pointer
+        return true;}
     // none of the pointers point to Me
     return false;
 }
 
 //helper function for split
-void foundationMove(char* Command, char* Parameter) {
+/*void foundationMove(char* Command, char* Parameter) {
     Card* from = getCard(Command);
     Card **foundation = NULL;
 
@@ -953,7 +956,7 @@ void foundationMove(char* Command, char* Parameter) {
     } else {
         sprintf(messenge, "Cannot move %s to %s", Command, Parameter);
     }
-}
+}*/
 
 void placeSafe(Card* from){
     if (!colPointingToMe(from)) {
@@ -1036,18 +1039,25 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 placeSafe(from);
                 to->nextCardCol = from;
                 from->inFoundation=true;
+
             }
 
         else{strcpy(messenge, "illegal move");}
 
     }
+
+
         else if(Parameter[0]!='F' && getCol(Parameter)&& canBePlaced(from, to) && getCol(Parameter)) {
+        if(from->inFoundation==true){from->inFoundation=false;}
             placeSafe(from);
             to->nextCardCol = from;
 
     }
         else{strcpy(messenge, "illegal move");}
     }
+
+
+
 
     else{
             Card* from=getCard(Command);
@@ -1059,7 +1069,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
         if(Parameter[0]=='F'&& from->inFoundation==false) {
 
             if(!cardInCol(getCol(Subcommand), from)){
-                sprintf(messenge, "Card %s not in foundation %s", Command, Subcommand);
+                sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
                 return;}
 
             Card **foundation=getFoundation(Parameter);
@@ -1082,25 +1092,22 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 }
                 else{strcpy(messenge, "illegal move");}
             }}
-        else if(Parameter[0]!='F'){
+
+
+        else if(Parameter[0]!='F' && Subcommand[0]!='F'){
          if(!cardInCol(getCol(Subcommand), from)){
             sprintf(messenge, "Card %s not in column %s", Command, Subcommand);
             return;}
 
          if(getCol(Parameter)&&canBePlaced(from, to) && !isUnderMe(from, to)) {
+
             placeSafe(from);
             to->nextCardCol = from;
             from->inFoundation=false;
-
-
         }
-
         }
-
          else{strcpy(messenge, "illegal move");}
     }
-
-
     }
 
     /*Card *from = getCard(Command);
@@ -1160,7 +1167,6 @@ Card* youPointingAtMe(Card* me){
         }
         head = head->nextCardDec;
     }
-
 }
 //counts the number of cards in the deck and returns integer with the count
 int numCards(Card* deck) {
@@ -1413,7 +1419,7 @@ Card *getCardAtIndexInCol(Card *head, int index)
 
 
 // Helper function to swap two cards
-void swapCards(Card* card1, Card* card2)
+/*void swapCards(Card* card1, Card* card2)
 {
     int temp_rank = card1->rank;
     enum Suit temp_suit = card1->suit;
@@ -1422,7 +1428,7 @@ void swapCards(Card* card1, Card* card2)
     card2->rank = temp_rank;
     card2->suit = temp_suit;
 }
-
+*/
 int getlength(Card* head) {
     int count = 0;
     Card* current = head;
