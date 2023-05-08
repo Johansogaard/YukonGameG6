@@ -3,7 +3,7 @@ project(YukonGameG6 C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(YukonGameG6 main.c)
+add_executable(YukonGameG6 main.c test_main.c)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 
