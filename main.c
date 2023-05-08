@@ -985,32 +985,35 @@ void split(Card *deck, int n, int split) {
 
     Card *shuffled = NULL;
     Card *current = NULL;
+
+    // Add the top card alternately from both piles until we finish all cards from one of the piles
     while (pile1 != NULL && pile2 != NULL) {
-        if (rand() % 2 == 0) {
-            if (shuffled == NULL) {
-                shuffled = pile1;
-                current = shuffled;
-            } else {
-                current->nextCardDec = pile1;
-                current = current->nextCardDec;
-            }
-            pile1 = pile1->nextCardDec;
+        if (shuffled == NULL) {
+            shuffled = pile1;
+            current = shuffled;
         } else {
-            if (shuffled == NULL) {
-                shuffled = pile2;
-                current = shuffled;
-            } else {
-                current->nextCardDec = pile2;
-                current = current->nextCardDec;
-            }
-            pile2 = pile2->nextCardDec;
+            current->nextCardDec = pile1;
+            current = current->nextCardDec;
         }
+        pile1 = pile1->nextCardDec;
+
+        if (shuffled == NULL) {
+            shuffled = pile2;
+            current = shuffled;
+        } else {
+            current->nextCardDec = pile2;
+            current = current->nextCardDec;
+        }
+        pile2 = pile2->nextCardDec;
     }
+
+    // Add any remaining cards from the other pile to the bottom of the shuffled pile
     if (pile1 != NULL) {
         current->nextCardDec = pile1;
     } else {
         current->nextCardDec = pile2;
     }
+
     Deck = shuffled;
     sprintf(messenge, "shuffled deck using split method, with parameter %d", p1_len);
 }
