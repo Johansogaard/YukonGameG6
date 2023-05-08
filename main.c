@@ -159,23 +159,10 @@ int main() {
 
         makeBoard(command, messenge, originput);
 
-        /*saveList(LD("/Users/victor/CLionProjects/YukonGameG6/deckofcards.txt"),"/Users/victor/CLionProjects/YukonGameG6/savecards.txt" );*/
+
     }
 
-    struct Card* deck;
 
-
-    int num_cards;
-    char filepath[] = "C:\\Users\\johan\\CLionProjects\\YukonGameG6\\deckofcards.txt";
-    // deck = LD(filepath);
-
-
-    /*printf("\nUnshuffled list\n");
-    printList(deck);
-    printf("\nshuffled list\n");
-    shuffleList(deck);
-    printList(deck);
-    */
 
 }
 /*
@@ -885,79 +872,6 @@ bool colPointingToMe(Card* Me){
     return false;
 }
 
-//helper function for split
-/*void foundationMove(char* Command, char* Parameter) {
-    Card* from = getCard(Command);
-    Card **foundation = NULL;
-
-    switch (Parameter[1]) {
-        case '1':
-            foundation = &f1;
-            break;
-        case '2':
-            foundation = &f2;
-            break;
-        case '3':
-            foundation = &f3;
-            break;
-        case '4':
-            foundation = &f4;
-            break;
-        default:
-            foundation = NULL;
-    }
-
-     if (from == NULL) {
-        // Handle case where card is not found
-        strcpy(messenge, "CARD not found");
-     return;}
-
-    if (from->inFoundation==true){
-        strcpy(messenge, "Card already in foundation");
-        return;}
-
-    if (foundation == NULL) {
-        strcpy(messenge, "foundation not found");
-    return;}
-
-    if (*foundation == NULL) {
-        // Handle case where foundation is not found
-        if ((strcmp(Command, "AC") == 0 || strcmp(Command, "AD") == 0 ||
-            strcmp(Command, "AH") == 0 || strcmp(Command, "AS") == 0) && (from->nextCardCol==NULL))  {
-
-            if(colPointingToMe(from)){
-                *foundation = from;
-                from->inFoundation=true;}
-
-            else if(youPointingAtMe(from)!=NULL){
-                if (youPointingAtMe(from)->hidden == true) {
-                youPointingAtMe(from)->hidden = false;}
-            youPointingAtMe(from)->nextCardCol = NULL;}
-            *foundation = from;
-            from->inFoundation=true;
-            sprintf(messenge, "Moved %s to %s", Command, Parameter);
-        }
-        else{sprintf(messenge, "Cannot move %s to %s", Command, Parameter);}
-    }
-
-    else if (from == NULL) {
-        // Handle case where card is not found
-        strcpy(messenge, "CARD not found");
-    } else if (canBePlacedFoundation(from, *foundation)&& (from->nextCardCol==NULL)) {
-        // Move the card to the foundation pile
-        youPointingAtMe(from)->nextCardCol = foundation;
-        *foundation = from;
-        from->inFoundation=true;
-        colPointingToMe(from);
-        if (youPointingAtMe(from)->hidden == true) {
-            youPointingAtMe(from)->hidden = false;
-        }
-        sprintf(messenge, "Moved %s to %s", Command, Parameter);
-    } else {
-        sprintf(messenge, "Cannot move %s to %s", Command, Parameter);
-    }
-}*/
-
 void placeSafe(Card* from){
     if (!colPointingToMe(from)) {
         if (youPointingAtMe(from)->hidden == true) {
@@ -1031,7 +945,9 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 placeSafe(from);
             *foundation = from;
             from->inFoundation=true;
-            }}
+            }
+            else{strcpy(messenge, "illegal move");}
+        }
 
         else if (canBePlacedFoundation(from, to)&& (from->nextCardCol==NULL)) {
             // Move the card to the foundation pile
@@ -1105,6 +1021,7 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
             to->nextCardCol = from;
             from->inFoundation=false;
         }
+         else{strcpy(messenge, "illegal move");}
         }
          else{strcpy(messenge, "illegal move");}
     }
@@ -1361,14 +1278,15 @@ char SuitIntToChar(int suit) {
 
 bool isUnderMe(Card *from, Card *to){
     Card *current = from;
-    while (current!=NULL){
-        if (current->nextCardCol==to){
+    while (current!=NULL) {
+        if (current->nextCardCol == to) {
             return true;
-        current=current->nextCardCol;
         }
+        current = current->nextCardCol;
+    }
         return false;
     }
-}
+
 
 const char *SuitIntToCharTermial(int suit) {
     switch (suit) {
