@@ -1257,13 +1257,13 @@ bool isUnderMe(Card *from, Card *to){
 const char *SuitIntToCharTermial(int suit) {
     switch (suit) {
         case C:
-            return "\u2663";
+            return "\u2667";
         case D:
             return "\u2666";
         case H:
             return "\u2665";
         case S:
-            return "\u2660";
+            return "\u2664";
          // return an error message if the integer is not recognized
     }
 }
