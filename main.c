@@ -21,7 +21,6 @@ typedef struct Cards {
     struct Cards *nextCardDec;
     struct Cards *nextCardCol;
 
-
 }Card;
 
 Card* Deck;
@@ -79,11 +78,8 @@ Card* getCard(char* card);
 void gameMove(char* command, char* Parameter, char*Subcommand);
 Card* youPointingAtMe(Card* me);
 Card *getCardAtIndexInCol(Card *head, int index);
-void saveToFile(char* File);
-void loadCards(char* File);
 bool colPointingToMe(Card* Me);
 void hide(Card* head);
-const char *SuitIntToCharTermial(int suit);
 void TakeOutOfFoundation(Card* head);
 bool isUnderMe(Card *from, Card *to);
 bool cardInCol(Card* col,Card* me);
@@ -336,7 +332,8 @@ char* doCommand(char *command, char* parameter, char* subcommand) {
         }
     }
 
-        else {if((strcmp(subcommand, "SR"))==0 || (strcmp(subcommand, "LD"))==0
+        else {
+            if((strcmp(subcommand, "SR"))==0 || (strcmp(subcommand, "LD"))==0
         || (strcmp(subcommand, "SD"))==0 || (strcmp(subcommand, "P"))==0 || (strcmp(subcommand, "LD"))==0
         || (strcmp(subcommand, "QQ"))==0 ||(strcmp(subcommand, "SW"))==0)
             {strcpy(messenge, "Command not available in the PLAY phase");}
@@ -346,15 +343,6 @@ char* doCommand(char *command, char* parameter, char* subcommand) {
                 playmode = false;
                 f1=f2=f3=f4=NULL;
                 TakeOutOfFoundation(Deck);}
-
-            else if (strcmp(subcommand, "S") == 0){
-                sprintf(messenge, "saved game to %s", parameter);
-                saveToFile(parameter);}
-
-            else if (strcmp(subcommand, "L") == 0){
-                sprintf(messenge, "loaded game from %s", parameter);
-                loadCards(parameter);}
-
 
 else if(subcommand!=NULL && parameter!=NULL /*&& (!(strcmp(command, parameter)))==0*/) {
 
@@ -412,8 +400,8 @@ bool printCCard(Card *c,int row,bool isEmpty) {
     if(getCardAtIndexInCol(c,row)!=NULL)
     {
         if(getCardAtIndexInCol(c,row)->hidden==false) {
-            printf("%c%s\t", RankIntToChar(getCardAtIndexInCol(c, row)->rank)
-                   , SuitIntToCharTermial(getCardAtIndexInCol(c, row)->suit));
+            printf("%c%c\t", RankIntToChar(getCardAtIndexInCol(c, row)->rank)
+                   , SuitIntToChar(getCardAtIndexInCol(c, row)->suit));
             return false;
         } else
         {
@@ -606,70 +594,7 @@ char getCharSuit(int Suit) {
     return suit; // Return the suit character
 }
 
-void saveToFile(char* File) {
-    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
 
-    Card *head = Deck;
-    FILE *fp = fopen(File, "wb");
-    if (fp == NULL) {
-        strcpy(messenge,"Error opening file");
-        return;
-    }
-    for (int i = 0; i < 7; i++) {
-        // Write the column identifier to the file
-        fwrite(&i, sizeof(int), 1, fp);
-
-        // Traverse the linked list for this column
-        Card *current = c[i];
-        while (current != NULL) {
-            // Write the Card struct to the file
-            fwrite(current, sizeof(Card), 1, fp);
-
-            // Move to the next Card in the linked list
-            current = current->nextCardCol;
-        }
-    }
-    fclose(fp);
-}
-
-void loadCards(char* file) {
-    Card *c[] = {c1, c2, c3, c4, c5, c6, c7};
-
-    FILE *fp = fopen(file, "rb");
-    if (fp == NULL) {
-        printf("Error opening file\n");
-        return;
-    }
-
-    // Loop over the file
-    while (!feof(fp)) {
-        // Read the column identifier from the file
-        int columnId;
-        fread(&columnId, sizeof(int), 1, fp);
-
-        // Read the Card struct from the file
-        Card *newCard = (Card *) malloc(sizeof(Card));
-        if (!newCard) {
-            printf("Memory allocation failed\n");
-            return;
-        }
-        fread(newCard, sizeof(Card), 1, fp);
-        newCard->nextCardCol = NULL;
-
-        // Add the Card struct to the linked list for this column
-        if (c[columnId] == NULL) {
-            c[columnId] = newCard;
-        } else {
-            Card *current = c[columnId];
-            while (current->nextCardCol != NULL) {
-                current = current->nextCardCol;
-            }
-            current->nextCardCol = newCard;
-        }
-    }
-
-    fclose(fp);
-}
 
 //saves the deck to a file, takes the deck and the output file as input
 void saveList(Card *head, char *filename) {
@@ -893,13 +818,13 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
 
         Card* to=cardAtEndOfCol(getCol(Parameter));
 
-    if(from==NULL || !isACol(Parameter)){strcpy(messenge, "wrong input"); return;}
+        if(from==NULL || !isACol(Parameter)){strcpy(messenge, "wrong input"); return;}
 
-    if(Parameter[0]=='F' && from->inFoundation==false) {
+        if(Parameter[0]=='F' && from->inFoundation==false) {
 
         Card **foundation=getFoundation(Parameter);
 
-        if (*foundation == NULL) {
+            if (*foundation == NULL) {
             // Handle case where foundation is not found
             if (from->rank==A && (from->nextCardCol==NULL))  {
 
@@ -916,14 +841,11 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
                 placeSafe(from);
                 to->nextCardCol = from;
                 from->inFoundation=true;
-
             }
 
         else{strcpy(messenge, "illegal move");}
 
     }
-
-
         else if(Parameter[0]!='F' && getCol(Parameter)&& canBePlaced(from, to) && getCol(Parameter)) {
         if(from->inFoundation==true){from->inFoundation=false;}
             placeSafe(from);
@@ -932,7 +854,6 @@ void gameMove(char* Command, char* Parameter, char*Subcommand){
     }
         else{strcpy(messenge, "illegal move");}
     }
-
 
     else{
             Card* from=getCard(Command);
@@ -1220,21 +1141,6 @@ bool isUnderMe(Card *from, Card *to){
     }
         return false;
     }
-
-
-const char *SuitIntToCharTermial(int suit) {
-    switch (suit) {
-        case C:
-            return "\u2667";
-        case D:
-            return "\u2666";
-        case H:
-            return "\u2665";
-        case S:
-            return "\u2664";
-         // return an error message if the integer is not recognized
-    }
-}
 
 // Helper function to get the card at a given index
 Card *getCardAtIndexInDeck(Card *head, int index)
