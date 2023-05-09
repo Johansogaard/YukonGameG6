@@ -30,12 +30,9 @@ Card *c1,*c2,*c3,*c4,*c5,*c6,*c7;
 //define f1-f4;
 Card *f1, *f2, *f3, *f4;
 
-int isBlack(Card *card) {
-    return card->suit == C || card->suit == S;
-}
 
-int isDifferentColor(Card *higher, Card *lower) {
-    return isBlack(higher) != isBlack(lower);
+int isDifferentSuit(Card *higher, Card *lower) {
+    return higher->suit != lower->suit;
 }
 
 int inSequence(Card *lower, Card *higher) {
@@ -43,7 +40,7 @@ int inSequence(Card *lower, Card *higher) {
 }
 
 int canBePlaced(Card *lower, Card *higher) {
-    return isDifferentColor(higher, lower) && inSequence(lower, higher);
+    return isDifferentSuit(higher, lower) && inSequence(lower, higher);
 }
 
 int isSameSuit(Card *first, Card *second) {
